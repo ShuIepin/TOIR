@@ -53,9 +53,9 @@ local Vector = Class("Vector")
 function Vector:__init(x, y, z)
 	self.type = "Vector"
 
-	self.x = x or GetPosX(x)
-	self.y = y or GetPosY(x)
-	self.z = z or GetPosZ(x)
+	self.x = x 
+	self.y = y
+	self.z = z 
 end
 
 --> Vector Class: Operators
