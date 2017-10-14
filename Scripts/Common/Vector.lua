@@ -53,15 +53,9 @@ local Vector = Class("Vector")
 function Vector:__init(x, y, z)
 	self.type = "Vector"
 
-	if x < 20000 then
-		self.x = x or 0
-		self.y = y or 0
-		self.z = z or 0
-	else
-		self.x = GetPosX(x) or 0
-		self.y = GetPosY(x) or 0
-		self.z = GetPosZ(x) or 0
-	end
+	self.x = x or GetPosX(x)
+	self.y = y or GetPosY(x)
+	self.z = z or GetPosZ(x)
 end
 
 --> Vector Class: Operators
