@@ -37,6 +37,23 @@
 			:Perpendicular() -> creates a new vector that is rotated 90° right
 			:Perpendicular2() -> creates a new vector that is rotated 90° left
 
+		Examples:
+			local Player = function() return GetMyChamp() end
+
+			function OnTick()
+  				local myHeroPos = { GetPosX(Player()), GetPosY(Player()), GetPosZ(Player()) }
+  				local mousePos = { GetCursorPosX(), GetCursorPosY(), GetCursorPosZ() }
+
+  				local vec1 = Vector(myHeroPos)
+  				local vec2 = Vector(mousePos)
+
+  				local vecAdd = vec1 + vec2
+  				local vecSub = vec2 - vec1
+  				local vecMult = vec1 * 10
+  				local vecDiv = vec / 10
+
+  				__PrintTextGame( tostring( vec1 ) )
+			end
 	}
 ]]
 
