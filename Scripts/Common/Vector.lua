@@ -65,15 +65,15 @@ Vector.meta2  	= {}
 
 -------------------------------------------------------------
 
---local assert          = assert
---local type 		= assert( type )   
---local setmetatable 	= assert( setmetatable )
---local getmetatable 	= assert( getmetatable )
---local math.sqrt 	= assert( math.sqrt ) 
---local math.sin 	= assert( math.sin ) 
---local math.acos 	= assert( math.acos ) 
---local rawget 		= assert( rawget ) 
---local rawset 		= assert( rawset )
+local assert            = assert
+local type 		= assert( type )   
+local setmetatable 	= assert( setmetatable )
+local getmetatable 	= assert( getmetatable )
+local mathsqrt 		= assert( math.sqrt ) 
+local mathsin 		= assert( math.sin ) 
+local mathacos 		= assert( math.acos ) 
+local rawget 		= assert( rawget ) 
+local rawset 		= assert( rawset )
 
 -------------------------------------------------------------
 
