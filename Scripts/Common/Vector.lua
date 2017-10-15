@@ -444,11 +444,11 @@ function Vector.meta1:__eq(v)
 end
 
 function Vector.meta1:__lt(v)
-  	return Vector.lt(self, v)
+  	return Vector.LessThan(self, v)
 end
 
 function Vector.meta1:__le(v)
-  	return Vector.le(self, v)
+  	return Vector.LessOrEqual(self, v)
 end
 
 function Vector.meta1:__tostring()
