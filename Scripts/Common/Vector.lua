@@ -286,7 +286,7 @@ function Vector:Len2(v)
 end
 
 function Vector:Len()
-	return math.sqrt(Vector.Len2(self))
+	return mathsqrt(Vector.Len2(self))
 end
 
 function Vector:DistanceTo(v)
@@ -330,20 +330,20 @@ end
 
 function Vector:Sin(v)
 	local c = Vector.CrossProduct(self, v)
-	return math.sqrt(Vector.Len2(c) / ( Vector.Len2(self) * Vector.Len2(v) ))
+	return mathsqrt(Vector.Len2(c) / ( Vector.Len2(self) * Vector.Len2(v) ))
 end
 
 function Vector:Cos(v)
-	return Vector.Len2(self, v) / math.sqrt( Vector.Len2(self) * Vector.Len2(v) )
+	return Vector.Len2(self, v) / mathsqrt( Vector.Len2(self) * Vector.Len2(v) )
 end
 
 function Vector:Angle(v)
-	return math.acos( Vector.Cos(self, v) )
+	return mathacos( Vector.Cos(self, v) )
 end
 
 function Vector:AffineArea(v)
 	local c = Vector.CrossProduct(self, v)
-	return math.sqrt( Vector.Len2(c) )
+	return mathsqrt( Vector.Len2(c) )
 end
 
 function Vector:TriangleArea(v)
@@ -351,17 +351,17 @@ function Vector:TriangleArea(v)
 end
 
 function Vector:RotateX(phi)
-	local cos, sin = math.cos(phi), math.sin(phi)
+	local cos, sin = math.cos(phi), mathsin(phi)
 	self.y, self.z = self.y * cos - self.z * sin, self.z * cos + self.y * sin
 end
 
 function Vector:RotateY(phi)
-	local cos, sin = math.cos(phi), math.sin(phi)
+	local cos, sin = math.cos(phi), mathsin(phi)
 	self.x, self.z = self.x * cos + self.z * sin, self.z * cos - self.x * sin
 end
 
 function Vector:RotateZ(phi)
-	local cos, sin = math.cos(phi), math.sin(phi)
+	local cos, sin = math.cos(phi), mathsin(phi)
 	self.x, self.y = self.x * cos - self.z * sin, self.y * cos + self.x * sin
 end
 
