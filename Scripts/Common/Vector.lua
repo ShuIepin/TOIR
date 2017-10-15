@@ -351,17 +351,17 @@ function Vector:TriangleArea(v)
 end
 
 function Vector:RotateX(phi)
-	local cos, sin = math.cos(phi), mathsin(phi)
+	local cos, sin = mathcos(phi), mathsin(phi)
 	self.y, self.z = self.y * cos - self.z * sin, self.z * cos + self.y * sin
 end
 
 function Vector:RotateY(phi)
-	local cos, sin = math.cos(phi), mathsin(phi)
+	local cos, sin = mathcos(phi), mathsin(phi)
 	self.x, self.z = self.x * cos + self.z * sin, self.z * cos - self.x * sin
 end
 
 function Vector:RotateZ(phi)
-	local cos, sin = math.cos(phi), mathsin(phi)
+	local cos, sin = mathcos(phi), mathsin(phi)
 	self.x, self.y = self.x * cos - self.z * sin, self.y * cos + self.x * sin
 end
 
