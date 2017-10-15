@@ -9,7 +9,7 @@
 			.z  ->  the z value
 
 		functions:
-			:Clone() -> returns a new vector
+			:Clone() -> returns a new vector  
 			:Unpack() -> returns x, y, z
 			:DistanceTo(Vector) -> returns distance to another vector
 			:Len() -> returns length
@@ -39,165 +39,406 @@
 	}
 ]]
 
+-------------------------------------------------------------
 
---> Requirements
+Vector 		= {}  
+Vector.meta1 	= {}          
+Vector.meta2  	= {}         
 
-local Class = IncludeFile("Class.lua")
+-------------------------------------------------------------
 
---> Vector Class
+function Vector.New(x, y, z)
+  	local this = {}
 
-local Vector = Class("Vector")
+  	if type(x) == 'table' then
+    		if Vector.IsVector(x) then
+      			this.x = x.x or 0
+      			this.y = x.y or 0
+      			this.y = x.z or 0
+    		else
+      			this.x = x[1] or 0
+      			this.y = x[2] or 0
+      			this.z = x[3] or 0
+    		end
+  	else
+    		this.x = x or 0
+    		this.y = y or 0
+    		this.z = z or 0
+  	end
 
---> Vector Class: Initialize
+  	this.Set 		= Vector.Set
+  	this.Clone 		= Vector.Clone
+  	this.Unpack 		= Vector.Unpack
+  	this.ToString 		= Vector.ToString
+  	this.ToArray 		= Vector.ToArray
+  	this.Addition 		= Vector.Addition
+  	this.Substract 		= Vector.Substract
+  	this.Multiply 		= Vector.Multiply
+  	this.Divide		= Vector.Divide
+  	this.Equal 		= Vector.Equal
+  	this.LessThan 		= Vector.LessThan
+  	this.LessOrEqual	= Vector.LessOrEqual
+  	this.Len 		= Vector.Len
+  	this.Len2 		= Vector.Len2
+  	this.DistanceTo         = Vector.DistanceTo
+  	this.Normalize          = Vector.Normalize
+  	this.Normalized         = Vector.Normalized
+  	this.Center             = Vector.Center
+  	this.CrossProduct	= Vector.CrossProduct
+  	this.DotProduct 	= Vector.DotProduct
+  	this.ProjectOn		= Vector.ProjectOn
+  	this.MirrorOn		= Vector.MirrorOn
+  	this.Sin 		= Vector.Sin
+  	this.Cos 		= Vector.Cos
+  	this.Angle 		= Vector.Angle
+  	this.AffineArea 	= Vector.AffineArea
+  	this.TriangleArea       = Vector.TriangleArea
+  	this.RotateX		= Vector.RotateX
+  	this.RotateY		= Vector.RotateY
+  	this.RotateZ		= Vector.RotateZ
+  	this.Rotate 		= Vector.Rotate
+  	this.Rotated 		= Vector.Rotated
+  	this.Polar 		= Vector.Polar
+  	this.AngleBetween 	= Vector.AngleBetween
+  	this.Perpendicular  	= Vector.Perpendicular
+  	this.Perpendicular2 	= Vector.Perpendicular2
 
-function Vector:__init(x, y, z)
-	self.type = "Vector"
+  	setmetatable(this, Vector.meta1)
 
-	self.x = x 
-	self.y = y
-	self.z = z 
+  	return this
 end
 
---> Vector Class: Operators
+function Vector:Set(x, y, z)
+  	if type(x) == 'table' then
+    		if Vector.IsVector(x) then
+      			self.x = x.x or 0
+      			self.y = x.y or 0
+      			self.y = x.z or 0
+      			return self
+    		end
 
-function Vector:__tostring()
-	return "Vector(" .. self.x .. ", " .. self.y .. ", " .. self.z .. ")"
+    		self.x = x[1] or 0
+    		self.y = x[2] or 0
+    		self.z = x[3] or 0
+    		return self
+  	end
+
+  	self.x = x or 0
+  	self.y = y or 0
+  	self.z = z or 0
+  	return self
 end
-
-function Vector:__add()
-	-- body
-end
-
-function Vector:__sub()
-	-- body
-end
-
-function Vector:__mul()
-	-- body
-end
-
-function Vector:__div()
-	-- body
-end
-
-function Vector:__lt()
-	-- body
-end
-
-function Vector:__le()
-	-- body
-end
-
-function Vector:__eq()
-	-- body
-end
-
-function Vector:__unm()
-	-- body
-end
-
---> Vector Class: Methods
 
 function Vector:Clone()
-	-- body
+  	return Vector.New(self.x, self.y, self.z)
 end
 
 function Vector:Unpack()
-	-- body
+	return self.x, self.y, self.z
 end
 
-function Vector:DistanceTo()
-	-- body
+function Vector:ToString()
+  	return "Vector(" .. self.x .. ", " .. self.y .. ", " .. self.z .. ")"
+end
+
+function Vector:ToArray()
+  	return {self.x or 0, self.y or 0, self.z or 0}
+end
+
+function Vector.IsVector(self)
+  	return getmetatable(self) == getmetatable(Vector)
+end
+
+function Vector:Addition(x, y, z)
+  	if type(x) == 'table' then
+    		if Vector.IsVector(x) then
+      			self.x = self.x + (x.x or 0)
+      			self.y = self.y + (x.y or 0)
+      			self.y = self.y + (x.z or 0)
+      			return self
+    		end
+
+    		self.x = self.x + (x[1] or 0)
+    		self.y = self.y + (x[2] or 0)
+    		self.z = self.z + (x[3] or 0)
+    		return self
+  	end
+
+  	self.x = self.x + (x or 0)
+  	self.y = self.y + (y or 0)
+  	self.z = self.z + (z or 0)
+  	return self
+end
+
+function Vector:Substract(x, y, z)
+  	if type(x) == 'table' then
+    		if Vector.IsVector(x) then
+      			self.x = self.x - (x.x or 0)
+      			self.y = self.y - (x.y or 0)
+      			self.z = self.z - (x.z or 0)
+      			return self
+    		end
+
+    		self.x = self.x - (x[1] or 0)
+    		self.y = self.y - (x[2] or 0)
+    		self.z = self.z - (x[3] or 0)
+    		return self
+  	end
+
+  	self.x = self.x - (x or 0)
+  	self.y = self.y - (y or 0)
+  	self.z = self.z - (z or 0)
+  	return self
+end
+
+function Vector:Multiply(n)
+  	self.x = self.x * (n or 0)
+  	self.y = self.y * (n or 0)
+  	self.z = self.z * (n or 0)
+  	return self
+end
+
+function Vector:Divide(n)
+  	self.x = self.x / (n or 0)
+  	self.y = self.y / (n or 0)
+  	self.z = self.z / (n or 0)
+  	return self
+end
+
+function Vector:Exponentiation(n)
+  	self.x = self.x ^ (n or 0)
+  	self.y = self.y ^ (n or 0)
+  	self.z = self.z ^ (n or 0)
+  	return self
+end
+
+function Vector:Equal(x, y, z)
+  	local a, b, c
+
+  	if type(x) == 'table' then
+    		if Vector.IsVector(x) then
+      			a = x.x or 0
+      			b = x.y or 0
+      			c = x.z or 0
+    		else
+      			a = x[1] or 0
+      			b = x[2] or 0
+      			c = x[3] or 0
+    		end
+  	else
+    		a = x or 0
+    		b = y or 0
+    		c = z or 0
+  	end
+
+  	return self.x == a and self.y == b and self.z == c
+end
+
+function Vector:LessThan(x, y, z)
+  	if type(x) == 'table' then
+    		return Vector.Len(self) < Vector.Len(x)
+  	end
+
+  	return Vector.Len(self) < x
+end
+
+function Vector:LessOrEqual(x, y, z)
+  	if type(x) == 'table' then
+    		return Vector.Len(self) <= Vector.Len(x)
+  	end
+
+  	return Vector.Len(self) <= x
+end
+
+function Vector:Len2(v)
+	local v = v and Vector.New(v) or Vector.Clone(self)
+	return self.x * v.x + self.y * v.y + self.z * v.z
 end
 
 function Vector:Len()
-	-- body
+	return math.sqrt(Vector.Len2(self))
 end
 
-function Vector:Len2()
-	-- body
+function Vector:DistanceTo(v)
+	local d = Vector.Clone(self) - v
+	return d:Len()
 end
 
 function Vector:Normalize()
-	-- body
+	local l = Vector.Len(self)
+	Vector.Divide(self, l)
 end
 
 function Vector:Normalized()
-	-- body
+	local v = Vector.Clone(self)
+	v:Normalize()
+	return v
 end
 
-function Vector:Center()
-	-- body
+function Vector:Center(v)
+	local c = Vector.Clone(self)
+
+	return Vector.New((c + v) / 2)
 end
 
-function Vector:CrossProduct()
-	-- body
+function Vector:CrossProduct(v)
+	return Vector.New(self.y * v.z - self.z * v.y, self.z * v.x - self.x * v.z, self.x * v.y - self.y * v.x)
 end
 
-function Vector:DotProduct()
-	-- body
+function Vector:DotProduct(v)
+	return self.x * v.x + self.y * v.y + self.z * v.z
 end
 
-function Vector:ProjectOn()
-	-- body
+function Vector:ProjectOn(v)
+	local l = Vector.Len2(v) / Vector.Len2(self)
+	return Vector.New(v * l)
 end
 
-function Vector:MirrorOn()
-	-- body
+function Vector:MirrorOn(v)
+	return Vector.ProjectOn(self, v) * 2
 end
 
-function Vector:Sin()
-	-- body
+function Vector:Sin(v)
+	local c = Vector.CrossProduct(self, v)
+	return math.sqrt(Vector.Len2(c) / ( Vector.Len2(self) * Vector.Len2(v) ))
 end
 
-function Vector:Cos()
-	-- body
+function Vector:Cos(v)
+	return Vector.Len2(self, v) / math.sqrt( Vector.Len2(self) * Vector.Len2(v) )
 end
 
-function Vector:Angle()
-	-- body
+function Vector:Angle(v)
+	return math.acos( Vector.Cos(self, v) )
 end
 
-function Vector:AffineArea()
-	-- body
+function Vector:AffineArea(v)
+	local c = Vector.CrossProduct(self, v)
+	return math.sqrt( Vector.Len2(c) )
 end
 
-function Vector:TriangleArea()
-	-- body
+function Vector:TriangleArea(v)
+	return Vector.AffineArea(self, v) / 2
 end
 
-function Vector:RotateX()
-	-- body
+function Vector:RotateX(phi)
+	local cos, sin = math.cos(phi), math.sin(phi)
+	self.y, self.z = self.y * cos - self.z * sin, self.z * cos + self.y * sin
 end
 
-function Vector:RotateY()
-	-- body
+function Vector:RotateY(phi)
+	local cos, sin = math.cos(phi), math.sin(phi)
+	self.x, self.z = self.x * cos + self.z * sin, self.z * cos - self.x * sin
 end
 
-function Vector:RotateZ()
-	-- body
+function Vector:RotateZ(phi)
+	local cos, sin = math.cos(phi), math.sin(phi)
+	self.x, self.y = self.x * cos - self.z * sin, self.y * cos + self.x * sin
 end
 
-function Vector:Rotate()
-	-- body
+function Vector:Rotate(phiX, phiY, phiZ)
+	if phiX ~= 0 then Vector.RotateX(self, phiX) end
+    	if phiY ~= 0 then Vector.RotateY(self, phiY) end
+    	if phiZ ~= 0 then Vector.RotateZ(self, phiZ) end
 end
 
-function Vector:Rotated()
-	-- body
+function Vector:Rotated(phiX, phiY, phiZ)
+	local v = Vector.Clone(self)
+	v:Rotate(phiX, phiY, phiZ)
+	return v
 end
 
 function Vector:Polar()
-	-- body
+	--
 end
 
-function Vector:AngleBetween()
-	-- body
+function Vector:AngleBetween(v1, v2)
+	--
 end
 
 function Vector:Perpendicular()
-	-- body
+	return Vector.New(-self.z, self.y, self.x)
 end
 
 function Vector:Perpendicular2()
-	-- body
+	return Vector.New(self.z, self.y, -self.x)
 end
+
+-------------------------------------------------------------
+
+function Vector.meta2.__call(t, x, y, z)
+  	return Vector.New(x, y, z)
+end
+
+function Vector.meta1:__index(k)
+  	if type(k) == 'number' then
+    		if k == 1 then return
+			self.x
+    		elseif k == 2 then
+    			return self.y
+    		elseif k == 3 then 
+    			return self.z
+    		end
+  	end
+
+  	rawget(self, k)
+end
+
+function Vector.meta1:__newindex(k, v)
+  	if type(k) == 'number' then
+    		if k == 1 then 
+    			self.x = v
+    		elseif k == 2 then 
+    			self.y = v
+    		elseif k == 3 then 
+    			self.z = v
+    		end
+  	else
+    		rawset(self, k, v)
+  	end
+end
+
+function Vector.meta1:__add(v)
+  	return Vector.Addition(Vector.Clone(self), v)
+end
+
+function Vector.meta1:__sub(v) 
+  	return Vector.Substract(Vector.Clone(self), v)
+end
+
+function Vector.meta1:__unm()
+  	return Vector.New(-self.x, -self.y, -self.z)
+end
+
+function Vector.meta1:__mul(n)
+  	return Vector.Multiply(Vector.Clone(self), n)
+end
+
+function Vector.meta1:__div(n)
+  	return Vector.Divide(Vector.Clone(self), n)
+end
+
+function Vector.meta1:__pow(n)
+  	return Vector.Exponentiation(Vector.Clone(self), n)
+end
+
+function Vector.meta1:__eq(v)
+  	return Vector.Equal(self, v)
+end
+
+function Vector.meta1:__lt(v)
+  	return Vector.lt(self, v)
+end
+
+function Vector.meta1:__le(v)
+  	return Vector.le(self, v)
+end
+
+function Vector.meta1:__tostring()
+  	return Vector.ToString(self)
+end
+
+-------------------------------------------------------------
+
+setmetatable(Vector, Vector.meta2)
+
+-------------------------------------------------------------
