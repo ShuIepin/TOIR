@@ -9,6 +9,7 @@
 			.z  ->  the z value
 
 		functions:
+			:Set(x, y, z) -> sets x, y, z
 			:Clone() -> returns a new vector  
 			:Unpack() -> returns x, y, z
 			:DistanceTo(Vector) -> returns distance to another vector
