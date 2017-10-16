@@ -460,7 +460,7 @@ end
 function Vector.meta1:__index(k)
   	if type(k) == 'number' then
     		if k == 1 then return
-			self.x
+			return self.x
     		elseif k == 2 then
     			return self.y
     		elseif k == 3 then 
