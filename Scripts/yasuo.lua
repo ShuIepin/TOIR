@@ -187,9 +187,8 @@ function OnTick()
 	if nKeyCode == SpaceKeyCode then
 		SetLuaCombo(true)
 		Combo()
+		CastR()
 	end
-
-	CastR()
 
 	--local target = GetTarget(SpellR.Range)
 	--
