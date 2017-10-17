@@ -191,11 +191,11 @@ function OnTick()
 
 	CastR()
 
-	local target = GetTarget(SpellR.Range)
-
-	if target ~= 0 then 
-		--__PrintTextGame( tostring( IsKnockedUp(target) ) )
-	end
+	--local target = GetTarget(SpellR.Range)
+	--
+	--if target ~= 0 then 
+	--	--__PrintTextGame( tostring( IsKnockedUp(target) ) )
+	--end
 end
 
 __PrintTextGame("yasuo.lua loaded")
