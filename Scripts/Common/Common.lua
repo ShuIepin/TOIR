@@ -252,7 +252,7 @@ function Vector:ToString()
 end
 
 function Vector:ToArray()
-  	return {self.x or 0, self.y or 0, self.z or 0}
+  	return {x = self.x or 0, y = self.y or 0, z = self.z or 0}
 end
 
 function Vector.IsVector(self)
@@ -514,6 +514,421 @@ function Vector:RotateAroundPoint(v, angle)
 end
 
 setmetatable(Vector, Vector.meta2)
+
+-------------------------------------------------------------
+
+Point 		= {}
+Point.meta1 	= {}
+Point.meta2 	= {}
+
+function Point.New(x, y, z)
+  	local this = {}
+
+  	if type(x) == 'table' then
+    		this.x = x.x or x[1] or 0
+    		this.y = (x.z and x.z ~= 0 and x.z < 999999 and x.z or x.y) or (x[3] and x[3] ~= 0 and x[3] < 999999 and x[3] or x[2])
+  	else
+    		this.x = x
+            	this.y = z and z ~= 0 and z < 999999 and z or y
+  	end
+
+  	this.type 		= "Point"
+
+  	this.Clone 		= Point.Clone
+  	this.Addition 		= Point.Addition
+  	this.Substract  	= Point.Substract
+  	this.Multiply		= Point.Multiply
+  	this.Divide		= Point.Divide
+  	this.Equal 		= Point.Equal
+  	this.ToString 		= Point.ToString
+  	this.Len2 		= Point.Len2
+  	this.Len 		= Point.Len
+  	this.DistanceTo		= Point.DistanceTo
+
+  	setmetatable(this, Point.meta1)
+
+  	return this
+end
+
+function Point.meta2.__call(t, x, y, z)
+  	return Point.New(x, y, z)
+end
+
+function Point.meta1:__index(k)
+  	if type(k) == 'number' then
+    		if k == 1 then 
+    			return self.x
+    		elseif k == 2 then
+    			return self.y
+    		end
+  	end
+
+  	rawget(self, k)
+end
+
+function Point.meta1:__newindex(k, v)
+  	if type(k) == 'number' then
+    		if k == 1 then
+    			self.x = v
+    		elseif k == 2 then
+    			self.y = v
+    		end
+  	else
+    		rawset(self, k, v)
+  	end
+end
+
+function Point.meta1:__add(v)
+  	return Point.Addition(Point.Clone(self), v)
+end
+
+function Point.meta1:__sub(v)
+  	return Point.Substract(Point.Clone(self), v)
+end
+
+function Point.meta1:__unm()
+  	return Point.New(-self.x, -self.y)
+end
+
+function Point.meta1:__mul(n)
+	return Point.Multiply(Point.Clone(self), n)
+end
+
+function Point.meta1:__div(n)
+  	return Point.Divide(Point.Clone(self), n)
+end
+
+function Point.meta1:__eq(v)
+  	return Point.Equal(self, v)
+end
+
+function Point.meta1:__tostring()
+  	return Point.ToString(self)
+end
+
+function Point:Clone()
+  	return Point.New(self.x, self.y)
+end
+
+function Point:Addition(x, y)
+  	if type(x) == 'table' then
+    		self.x = self.x + (x.x or x[1] or 0)
+    		self.y = self.y + (x.y or x[2] or 0)
+    		return self
+  	end
+
+  	self.x = self.x + (x or 0)
+  	self.y = self.y + (y or 0)
+  	return self
+end
+
+function Point:Substract(x, y)
+	if type(x) == 'table' then
+    		self.x = self.x - (x.x or x[1] or 0)
+    		self.y = self.y - (x.y or x[2] or 0)
+    		return self
+  	end
+
+  	self.x = self.x - (x or 0)
+  	self.y = self.y - (y or 0)
+  	return self
+end
+
+function Point:Multiply(n)
+  	self.x = self.x * (n or 0)
+  	self.y = self.y * (n or 0)
+  	return self
+end
+
+function Point:Divide(n)
+  	self.x = self.x / (n or 0)
+  	self.y = self.y / (n or 0)
+  	return self
+end
+
+function Point:Equal(x, y)
+  	local a, b
+
+  	if type(x) == 'table' then
+    		a = x.x or x[1] or 0
+      		b = x.y or x[2] or 0
+  	else
+    		a = x or 0
+    		b = y or 0
+  	end
+
+  	return self.x == a and self.y == b
+end
+
+function Point:ToString()
+  	return "Point(" .. self.x .. ", " .. self.y .. ")"
+end
+
+function Point:Len2(p)
+	local p = p and Point.New(p) or Point.Clone(self)
+	return self.x * p.x + self.y * p.y
+end
+
+function Point:Len()
+	return sqrt(Point.Len2(self))
+end
+
+function Point:DistanceTo(obj)
+	if obj.type == "Point" then
+		return (Point.Clone(self) - obj):Len()
+	elseif obj.type == "Line" then
+		return obj:DistanceTo(self)
+	end
+end
+
+setmetatable(Point, Point.meta2)
+
+-------------------------------------------------------------
+
+Line 		= {}
+Line.meta1 	= {}
+Line.meta2 	= {}
+
+function Line.New(p1, p2)
+  	local this = {}
+
+  	local a, b = p1, p2
+
+  	if p1.type ~= "Point" then
+  		a = Point(p1)
+  	end
+
+  	if p2.type ~= "Point" then
+  		b = Point(p2)
+  	end
+
+  	this.type 		= "Line"
+  	this.points 		= { a, b }
+
+  	this.GetLineSegments 		= Line.GetLineSegments
+  	this.Equal 			= Line.Equal
+  	this.DistanceTo 		= Line.DistanceTo
+
+  	setmetatable(this, Line.meta1)
+
+  	return this
+end
+
+function Line.meta2.__call(t, x, y, z)
+  	return Line.New(x, y, z)
+end
+
+function Line.meta1:__index(k)
+  	if type(k) == 'number' then
+    		if k == 1 then 
+    			return self.p1
+    		elseif k == 2 then
+    			return self.p2
+    		end
+  	end
+
+  	rawget(self, k)
+end
+
+function Line.meta1:__newindex(k, v)
+  	if type(k) == 'number' then
+    		if k == 1 then
+    			self.p1 = v
+    		elseif k == 2 then
+    			self.p2 = v
+    		end
+  	else
+    		rawset(self, k, v)
+  	end
+end
+
+function Line.meta1:__eq(v)
+  	return Line.Equal(self, v)
+end
+
+function Line:Equal(l)
+	--
+end
+
+function Line:DistanceTo(obj)
+	if obj.type == "Point" then
+		local d = self.points[2].x - self.points[1].x
+
+		if d == 0 then
+			return abs(obj.x - self.points[2].x)
+		end
+
+		local m = (self.points[2].y - self.points[1].y) / d
+		return abs((m * obj.x - obj.y + (self.points[1].y - m * self.points[1].x)) / sqrt(m * m + 1))
+	elseif obj.type == "Line" then
+		local d1 = self.points[1]:DistanceTo(obj)
+		local d2 = self.points[2]:DistanceTo(obj)
+
+		if d1 ~= d2 then
+                	return 0 
+            	else
+                	return d1
+            	end
+	end
+end
+
+function Line:GetLineSegments()
+	return { self }
+end
+
+setmetatable(Line, Line.meta2)
+
+-------------------------------------------------------------
+
+Spell 		= {}
+Spell.meta1 	= {}
+Spell.meta2 	= {}
+
+function Spell.New(slot, range)
+	local this = {}
+
+	this.slot = slot
+	this.range = range
+
+	this.IsReady			= Spell.IsReady
+	this.SetSkillShot		= Spell.SetSkillShot
+	this.SetTargetted		= Spell.SetTargetted
+	this.VPGetLineCastPosition	= Spell.VPGetLineCastPosition
+	this.VPGetCircularCastPosition  = Spell.VPGetCircularCastPosition
+	this.GetCollision		= Spell.GetCollision
+	this.Cast 			= Spell.Cast
+
+	setmetatable(this, Spell.meta1)
+
+	return this
+end
+
+function Spell.meta2.__call(t, slot, range)
+  	return Spell.New(slot, range)
+end
+
+function Spell.meta1:__index(k)
+  	if type(k) == 'number' then
+    		if k == 1 then 
+    			return self.slot
+    		elseif k == 2 then
+    			return self.range
+    		end
+  	end
+
+  	rawget(self, k)
+end
+
+function Spell.meta1:__newindex(k, v)
+  	if type(k) == 'number' then
+    		if k == 1 then
+    			self.slot = v
+    		elseif k == 2 then
+    			self.range = v
+    		end
+  	else
+    		rawset(self, k, v)
+  	end
+end
+
+function Spell:IsReady()
+	return CanCast(self.slot)
+end
+
+function Spell:SetSkillShot(delay, width, speed, type, collision)
+	self.delay = delay or 0.25
+	self.width = width or 0
+	self.speed = speed or huge
+	self.type = type or 0
+	self.collision = collision or false
+	self.isSkillshot = true
+end
+
+function Spell:SetTargetted(delay, speed)
+	self.delay = delay or 0.25
+	self.speed = speed or huge
+	self.isTargetted = true
+end
+
+function Spell:VPGetLineCastPosition(target)
+	local distance = GetDistance(target)
+	local timeMissile = self.delay + distance / self.speed
+	local realDistance = timeMissile * GetMoveSpeed(target)
+
+	if realDistance == 0 then 
+		return distance 
+	end
+
+	return realDistance
+end
+
+function Spell:VPGetCircularCastPosition(target)
+	local distance = GetDistance(target)
+	local timeMissile = self.delay
+	local realDistance = timeMissile * GetMoveSpeed(target)
+
+	if realDistance == 0 then
+		if distance - self.width / 2 > 0 then
+			return distance - self.width / 2
+		end
+
+		return distance
+	end
+
+	if realDistance - self.width / 2 > 0 then
+		return realDistance - self.width / 2
+	end
+	
+	return realDistance
+end
+
+function Spell:GetCollision(target, distance)
+	local castPos = self.type == 0 and self:VPGetLineCastPosition(target) or self:VPGetCircularCastPosition(target)
+	local distance = distance or castPos
+
+	if self.collision then
+		local count = 0
+		local predPos = { x = GetPredictionPosX(target, distance), z = GetPredictionPosZ(target, distance) }
+		local myPos = GetPos(UpdateHeroInfo())
+		local targetPos = GetPos(target)
+
+		if predPos.x ~= 0 and predPos.z ~= 0 then
+			count = CountObjectCollision(0, target, myPos.x, myPos.z, predPos.x, predPos.z, self.width, self.range, 10)
+		else
+			count = CountObjectCollision(0, target, myPos.x, myPos.z, targetPos.x, targetPos.z, self.width, self.range, 10)
+		end
+
+		if count == 0 then
+			return false
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function Spell:Cast(target)
+	if self.isSkillshot then
+		local castPos = self.type == 0 and self:VPGetLineCastPosition(target) or self:VPGetCircularCastPosition(target)
+
+		if castPos > 0 and castPos < self.range then
+			if self.collision then
+				if not self:GetCollision(target) then
+					CastSpellToPredictionPos(target, self.slot, castPos)
+				end
+			else
+				CastSpellToPredictionPos(target, self.slot, castPos)
+			end
+		end
+	elseif self.isTargetted then
+		CastSpellTarget(target, self.slot)
+	else
+		CastSpellTarget(target ~= 0 and target or UpdateHeroInfo(), self.slot)
+	end
+end
+
+setmetatable(Spell, Spell.meta2)
 
 -------------------------------------------------------------
 
@@ -870,11 +1285,21 @@ function IsUnderAllyTurret(unit, searchRange)
 	return false
 end
 
+local W = Spell(0, 950)
+W:SetSkillShot(0.25, 100, 1500, 0, true)
+
+
 function OnTick()
 
-	local target = GetEnemyChampCanKillFastest(15000)
+	local myPoint1 = Point( GetPos( UpdateHeroInfo() ) )
+	local myPoint2 = Point( GetCursorPos() )
 
-	if target ~= 0 then
-		--print( GetDistance( GetPos( target ) ) )
-	end
+	local myPoint3 = Point( GetPos( UpdateHeroInfo() ) ) + { x = 5000, y = 150 }
+	local myPoint4 = Point( GetCursorPos() ) - { x = 500, y = 150 }
+
+	local myLine1 = Line( myPoint1, myPoint2 ) 
+	local myLine2 = Line( myPoint3, myPoint4 ) 
+
+	print( myLine1:DistanceTo(myLine2) )
+
 end
