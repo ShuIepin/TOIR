@@ -1,6 +1,6 @@
 IncludeFile("Vector.lua")
 
-if GetChampName(UpdateHeroInfo()) ~= "Yasuo" then return end
+--if GetChampName(UpdateHeroInfo()) ~= "Yasuo" then return end
 
 local Q = 0
 local W = 1
