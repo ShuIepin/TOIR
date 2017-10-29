@@ -1285,6 +1285,8 @@ function IsUnderAllyTurret(unit, searchRange)
 	return false
 end
 
+--[[
+
 local W = Spell(0, 950)
 W:SetSkillShot(0.25, 100, 1500, 0, true)
 
@@ -1302,4 +1304,4 @@ function OnTick()
 
 	print( myLine1:DistanceTo(myLine2) )
 
-end
+end ]]
