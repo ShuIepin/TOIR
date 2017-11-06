@@ -22,6 +22,49 @@ local pairs		= assert( pairs )
 local ipairs		= assert( ipairs )
 local rawget 		= assert( rawget ) 
 local rawset 		= assert( rawset )
+local open 		= assert( io.open )
+local close  		= assert( io.close )
+
+--> Globals
+
+SCRIPT_PATH = GetScriptPath()
+
+--> IO
+
+function FileExists(path)
+	local f = open(path, "r")
+
+	if f then 
+		close(f) 
+		return true 
+	else 
+		return false 
+	end
+end
+
+function WriteFile(text, path, mode)
+	local f = open(path, mode or "w+")
+
+	if not f then
+		return false
+	end
+
+	f:write(text)
+	f:close()
+	return true
+end
+
+function ReadFile(path)
+	local f = open(path, "r")
+
+	if not f then
+		return "WRONG PATH"
+	end
+
+	local text = f:read("*all")
+	f:close()
+	return text
+end
 
 function print(...)
 	local t, len = {}, select("#", ...)
