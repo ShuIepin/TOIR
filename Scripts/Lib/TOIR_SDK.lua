@@ -42,6 +42,7 @@ local Callbacks = {
         ["ProcessSpell"] = {},
         ["CreateObject"] = {},
         ["DeleteObject"] = {},
+	["WndMsg"]       = {},
 }
 
 Callback.Add = function(type, cb) table.insert(Callbacks[type], cb) end
@@ -107,6 +108,14 @@ function OnDeleteObject(unit)
         if unit then
                 for i, cb in pairs(Callbacks["DeleteObject"]) do
                         cb(unit)
+                end
+        end
+end
+
+function OnWndMsg(msg, key)   
+        if msg then
+                for i, cb in pairs(Callbacks["WndMsg"]) do
+                        cb(msg, key)
                 end
         end
 end
@@ -498,7 +507,7 @@ function Vector:Sin(v)
 end
 
 function Vector:Cos(v)
-        return self:Len2(v) / sqrt(self:Len2() * v:Len2())
+        return self:Len2(v) / math.sqrt(self:Len2() * v:Len2())
 end
 
 function Vector:Angle(v)
