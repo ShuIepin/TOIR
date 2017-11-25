@@ -2306,7 +2306,7 @@ function MenuStringList.new(name, stringlist, index)
         return this
 end
 
-local menuInst = MainMenu.new()
+menuInst = MainMenu.new()
 menuInst.addItem(MenuSeparator.new("ShulepinAIO", true))
 
 Callback.Add("Draw", function()
