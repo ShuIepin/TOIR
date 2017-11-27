@@ -625,7 +625,7 @@ function IsAfterAttack()
         end
 end
 
-local function VectorPointProjectionOnLineSegment(v1, v2, v)
+function VectorPointProjectionOnLineSegment(v1, v2, v)
         local cx, cy, ax, ay, bx, by = v.x, (v.z or v.y), v1.x, (v1.z or v1.y), v2.x, (v2.z or v2.y)
         local rL = ((cx - ax) * (bx - ax) + (cy - ay) * (by - ay)) / ((bx - ax) ^ 2 + (by - ay) ^ 2)
         local pointLine = { x = ax + rL * (bx - ax), z = ay + rL * (by - ay) }
