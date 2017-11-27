@@ -924,7 +924,7 @@ end
        |_|             
 --]]
 
-local Spell = class()
+Spell = class()
 
 function Spell:__init(slot, range)
         self.slot = slot 
@@ -1011,7 +1011,7 @@ end
                            
 --]]
 
-local Draw = class()
+Draw = class()
 
 local function DrawLines(t, w, c)
         for i = 1, #t - 1 do
