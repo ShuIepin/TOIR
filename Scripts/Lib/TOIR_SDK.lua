@@ -43,6 +43,8 @@ local Callbacks = {
         ["CreateObject"] = {},
         ["DeleteObject"] = {},
 	["WndMsg"]       = {},
+	["DoCast"]       = {},
+        ["PlayAnimation"] = {},
 }
 
 Callback.Add = function(type, cb) table.insert(Callbacks[type], cb) end
@@ -116,6 +118,22 @@ function OnWndMsg(msg, key)
         if msg then
                 for i, cb in pairs(Callbacks["WndMsg"]) do
                         cb(msg, key)
+                end
+        end
+end
+
+function OnDoCast(unit, spell)
+        if unit and spell then
+                for i, cb in pairs(Callbacks["DoCast"]) do
+                        cb(unit, spell)
+                end
+        end
+end
+
+function OnPlayAnimation(unit, anim)
+        if unit and anim then
+                for i, cb in pairs(Callbacks["PlayAnimation"]) do
+                        cb(unit, anim)
                 end
         end
 end
@@ -640,7 +658,7 @@ function Common:GetDistance(p1, p2)
 end
 
 function Common:GetMousePos()
-	return { x = GetCursorPosX(), y = GetCursorPosY(), z = GetCursorPosZ() }
+	return { x = GetMousePosX(), y = GetMousePosY(), z = GetMousePosZ() }
 end
 
 function Common:GetCursorPos()
