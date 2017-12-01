@@ -78,7 +78,7 @@ function OnLoad()
 		self.menu_combo_q = self.menu_combo.addItem(MenuBool.new("Use Q", true))
 		self.menu_combo_w = self.menu_combo.addItem(MenuBool.new("Use W", true))
 		self.menu_combo_e = self.menu_combo.addItem(MenuBool.new("Use E", true))
-		self.menu_combo_e_mode = self.menu_combo.addItem(MenuStringList.new("E Mode", { "Side  ", "Target", "Mouse " }, 1))
+		self.menu_combo_e_mode = self.menu_combo.addItem(MenuStringList.new("E Mode", { "Side  ", "Mouse", "Target " }, 1))
 		self.menu_combo_prio = self.menu_combo.addItem(MenuStringList.new("Spell Priority", { "Q ", "W ", "E " }, 3))
 
 		--Draw Menu
