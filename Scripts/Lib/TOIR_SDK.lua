@@ -1,3 +1,5 @@
+SDK_VERSION = 0.1
+
 ----------------------------------------------------------------
 -- SANDBOX
 ----------------------------------------------------------------
@@ -587,27 +589,24 @@ function VPGetLineCastPosition(target, delay, speed)
         return realDistance
 end
 
-function GetCollision(Target, Delay, Width, Range, Speed, vp_distance)
-    	local PredPosX = GetPredictionPosX(Target, vp_distance)
-    	local PredPosZ = GetPredictionPosZ(Target, vp_distance)
-    	local x1 = GetPosX(myHero.Addr)
-    	local z1 = GetPosZ(myHero.Addr)
-    	local x2 = GetPosX(Target)
-    	local z2 = GetPosZ(Target)
+function GetCollision(target, width, range, distance)
+        local predPos = GetPredictionPos(target)
+        local myHeroPos = GetOrigin(myHero)
+        local targetPos = GetOrigin(target)
 
-    	local nCountMinionCollision = 0
+        local count = 0
 
-    	if PredPosX ~= 0 and PredPosZ ~= 0 then
-        	nCountMinionCollision = CountObjectCollision(0, Target, x1, z1, PredPosX, PredPosZ, Width, Range, 10)
-    	else
-        	nCountMinionCollision = CountObjectCollision(0, Target, x1, z1, x2, z2, Width, Range, 10)
-    	end
+        if predPos.x ~= 0 and predPos.z ~= 0 then
+                count = CountObjectCollision(0, target, myHeroPos.x, myHeroPos.z, predPos.x, predPos.z, width, range, 10)
+        else
+                count = CountObjectCollision(0, target, myHeroPos.x, myHeroPos.z, targetPos.x, targetPos.z, width, range, 10)
+        end
 
-    	if nCountMinionCollision == 0 then
-        	return false
-    	end
+        if count == 0 then
+                return false
+        end
 
-    	return true
+        return true
 end
 
 function IsAfterAttack()
@@ -1416,7 +1415,7 @@ end
 
 SubMenu = {}
 
-function SubMenu.new(name)
+function SubMenu.new(name, color)
         local this = {}
 
         this.conf = {}
@@ -1434,6 +1433,7 @@ function SubMenu.new(name)
         this.fullHeight = 0
         this.yOffset=0
         this.childWidth= ITEMWIDTH
+        this.color = color or MENUTEXTCOLOR
         this.children = {}
         
         this.textlengthAdd=55
@@ -1600,7 +1600,7 @@ function SubMenu.new(name)
                         this.rectangle:Draw2(MENUBGCOLOR)
                 end 
                 DrawTextD3DX(this.pos.x+this.rectangle.width-15, this.textY, ">", MENUTEXTCOLOR)
-                DrawTextD3DX(this.pos.x+5, this.textY, this.name, MENUTEXTCOLOR)
+                DrawTextD3DX(this.pos.x+5, this.textY, this.name, this.color)
                 FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
                 
                 if not this.active then return end
@@ -1915,7 +1915,7 @@ function MenuSeparator.new(name, center)
         end
 
         function this.setValue(val)
-                
+                this.name = val
         end
         
         function this.expand(newWidth)
@@ -2230,7 +2230,7 @@ end
 ----------------------------------------------------------------
 
 menuInst = MainMenu.new() 
-menuInst.addItem(MenuSeparator.new("TOIR MENU", true))
+menuInstSep = menuInst.addItem(MenuSeparator.new("TOIR MENU", true))
 
 Callback.Add("Draw", function()
         menuInst.onLoop()
@@ -2316,6 +2316,10 @@ function Spell:Cast(target)
         elseif self.isActive then
                 CastSpellTarget(myHero.Addr, self.slot)
         end
+end
+
+function Spell:CastToPos(pos)
+        CastSpellToPos(pos.x, pos.z, self.slot)
 end
 
 ----------------------------------------------------------------
@@ -3238,7 +3242,9 @@ function GetDamage(spell, target, stage, level)
         return 0
 end
 
----
+----------------------------------------------------------------
+-- Target Selector
+----------------------------------------------------------------
 
 TargetSelector = class()
 
@@ -3270,7 +3276,7 @@ function TargetSelector:__init(range, damageType, from, focusSelected, menu, dra
                 self.tsMenu_focus = self.tsMenu.addItem(SubMenu.new("Focus Target Settings"))
                 self.tsMenu_focus_selected = self.tsMenu_focus.addItem(MenuBool.new("Focus Selected Target", true))
                 self.tsMenu_focus_selected_only = self.tsMenu_focus.addItem(MenuBool.new("Attack Only Selected Target", true))
-                self.tsMenu_mode = self.tsMenu.addItem(MenuStringList.new("Mode", {"Auto Priority", "Less Attack", "Less Cast", "Lowest HP", "Most AD", "Most AP", "Closest", "Closest to Mouse"}, 3))
+                self.tsMenu_mode = self.tsMenu.addItem(MenuStringList.new("Mode", {"Auto Priority", "Less Attack", "Less Cast", "Lowest HP", "Most AD", "Most AP", "Closest", "Closest to Mouse"}, 1))
 
                 self.ts_prio = {}
                 self.tsMenu.addItem(MenuSeparator.new("    Priority Settings", true))
