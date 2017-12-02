@@ -1,4 +1,4 @@
-SDK_VERSION = 0.1
+SDK_VERSION = 0.2
 
 ----------------------------------------------------------------
 -- SANDBOX
@@ -84,6 +84,10 @@ _G.LIB_PATH = SCRIPT_PATH .. "Lib\\"
 -- CALLBACKS
 ----------------------------------------------------------------
 
+local Vision = {}
+local NewPath = {}
+local VisionTick = GetTickCount()
+local WaypointTick = GetTickCount()
 local Keys = {}
 local KeysActive = false
 for i = 1, 255, 1 do
@@ -93,23 +97,105 @@ end
 Callback = class()
 
 local Callbacks = {
-        ["Load"]         = {},
-        ["Tick"]         = {},
-        ["Update"]       = {},
-        ["Draw"]         = {},
-        ["UpdateBuff"]   = {},
-        ["RemoveBuff"]   = {},
-        ["ProcessSpell"] = {},
-        ["CreateObject"] = {},
-        ["DeleteObject"] = {},
-        ["WndMsg"]       = {},
-        ["KeyPress"]     = {},
-        ["DoCast"]       = {},
+        ["Load"]          = {},
+        ["Tick"]          = {},
+        ["Update"]        = {},
+        ["Draw"]          = {},
+        ["UpdateBuff"]    = {},
+        ["RemoveBuff"]    = {},
+        ["ProcessSpell"]  = {},
+        ["CreateObject"]  = {},
+        ["DeleteObject"]  = {},
+        ["WndMsg"]        = {},
+        ["KeyPress"]      = {},
+        ["DoCast"]        = {},
         ["PlayAnimation"] = {},
+        ["Vision"]        = {},
+        ["NewPath"]       = {}, 
+        ["Dash"]          = {},
 }
 
 Callback.Add = function(type, cb) t.insert(Callbacks[type], cb) end
 Callback.Del = function(type, id) t.remove(Callbacks[type], id or 1) end
+
+local function OnVision(pUnit)   
+        local unit = GetAIHero(pUnit)
+
+        if Vision[unit.NetworkId] == nil then 
+                Vision[unit.NetworkId] = {state = unit.IsVisible , time = os.clock()} 
+        end 
+
+        if Vision[unit.NetworkId].state == true and not unit.IsVisible then
+                Vision[unit.NetworkId].state = false 
+                Vision[unit.NetworkId].time = os.clock() 
+                
+                for i, cb in pairs(Callbacks["Vision"]) do
+                        cb(unit, Vision[unit.NetworkId].state, Vision[unit.NetworkId].time)             
+                end     
+        end
+
+        if Vision[unit.NetworkId].state == false and unit.IsVisible then
+                Vision[unit.NetworkId].state = true 
+                Vision[unit.NetworkId].time = os.clock()  
+                for i, cb in pairs(Callbacks["Vision"]) do
+                        cb(unit, Vision[unit.NetworkId].state, Vision[unit.NetworkId].time)             
+                end     
+        end     
+end
+
+local function OnWaypoint(pUnit)            
+        local unit = GetAIHero(pUnit)
+        local unitPosTo = Vector(GetDestPos(pUnit))
+
+        if NewPath[unit.NetworkId] == nil then 
+                NewPath[unit.NetworkId] = {pos = unitPosTo , speed = unit.MoveSpeed, time = os.clock()} 
+        end 
+
+        if NewPath[unit.NetworkId].pos ~= unitPosTo then                      
+                local unitPos = Vector(GetPos(pUnit))
+                local isDash = unit.IsDash
+                local dashSpeed = unit.DashSpeed or 0
+                local dashGravity = unit.DashGravity or 0
+                local dashDistance = GetDistance(unitPos, unitPosTo) 
+
+                NewPath[unit.NetworkId] = {startPos = unitPos, pos = unitPosTo , speed = unit.MoveSpeed, time = os.clock()}
+                for i, cb in pairs(Callbacks["NewPath"]) do
+                        cb(unit, unitPos, unitPosTo, isDash, dashSpeed, dashGravity, dashDistance)         
+                end     
+
+                if isDash then
+                        for i, cb in pairs(Callbacks["Dash"]) do
+                                cb(unit, unitPos, unitPosTo, dashSpeed, dashGravity, dashDistance)            
+                        end                                     
+                end
+        end                             
+end
+
+local function OnVisionLoop()      
+        if GetTickCount() - VisionTick > 100 then
+                SearchAllChamp()                
+                local h = pObjChamp
+                for k,v in pairs(h) do                  
+                        if IsChampion(v) then
+                                OnVision(v) 
+                        end                            
+                end
+                VisionTick = GetTickCount()
+        end
+end
+
+local function OnWaypointLoop()            
+        if GetTickCount() - WaypointTick > 100 then
+                SearchAllChamp()                
+                local h = pObjChamp
+                for k, v in pairs(h) do                          
+                        if IsChampion(v) then
+                                OnWaypoint(v)  
+                        end                         
+                end
+                WaypointTick = GetTickCount()
+        end
+end
 
 local function OnKeyPressEvent(keyCode, pressed)
         for i, cb in pairs(Callbacks["KeyPress"]) do
@@ -159,6 +245,8 @@ function OnUpdate()
         end
 
         OnKeyPressLoop()
+        OnVisionLoop() 
+        OnWaypointLoop()
 end
 
 function OnDraw()
@@ -230,6 +318,8 @@ function OnPlayAnimation(unit, anim)
                 end
         end
 end
+
+
 
 ----------------------------------------------------------------
 -- COMMON
@@ -647,6 +737,7 @@ function FileExists(path)
 end
 
 function WriteFile(text, path, mode)
+        local path = path or SCRIPT_PATH .. "out.txt"
         local f = IO.open(path, mode or "w+")
 
         if not f then
@@ -714,6 +805,23 @@ function GetAllHeroes()
 
         return result
 end
+--[[
+function GetPathIndex(unit)
+        local result = 1--unit.GetPath(1)
+
+        for i= 2, unit.PathCount do
+                local myHeroPos = Vector(GetPos(unit.Addr))
+                local iPath = Vector(unit.GetPath(i))
+                local iMinusPath = Vector(unit.GetPath(i-1))
+
+                if GetDistance(iPath,myHeroPos) < GetDistance(iMinusPath,myHeroPos) and 
+                    GetDistance(iPath,iMinusPath) <= GetDistance(iMinusPath,myHeroPos) and i ~= unit.PathCount then
+                        result = i --unit.GetPath(i)
+                end
+        end
+
+        return result
+end]]
 
 Callback.Add("Update", function()
         myHero = GetMyHero()
@@ -1448,6 +1556,10 @@ function SubMenu.new(name, color)
         function this.setValue(val)
                 this.conf=val
         end
+
+        function this.setColor(color)
+                this.color = color
+        end
         
         function this.processInput(key, pressed, mouseVector)
         
@@ -1878,7 +1990,7 @@ end
 
 MenuSeparator = {}
 
-function MenuSeparator.new(name, center)
+function MenuSeparator.new(name, center, color)
         local this = {}
 
         this.name = name or "Unnamed"
@@ -1897,6 +2009,8 @@ function MenuSeparator.new(name, center)
         this.dragPos=Vector()
         this.dragging=false
         this.dragUnlocked=false
+
+        this.color = color or MENUTEXTCOLOR
         
         function this.processInput(key, pressed, mouseVector)
                 if key==1 and not pressed then
@@ -1916,6 +2030,10 @@ function MenuSeparator.new(name, center)
 
         function this.setValue(val)
                 this.name = val
+        end
+
+        function this.setColor(color)
+                this.color = color
         end
         
         function this.expand(newWidth)
@@ -1972,7 +2090,7 @@ function MenuSeparator.new(name, center)
                 local textH = this.textCenter and (this.textX - (this.textW/2)) or this.pos.x + 5
 
                 this.rectangle:Draw2(MENUBGCOLOR)
-                DrawTextD3DX(textH, this.textY, this.name,MENUTEXTCOLOR)
+                DrawTextD3DX(textH, this.textY, this.name, this.color)
                 FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
         
