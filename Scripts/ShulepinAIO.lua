@@ -825,7 +825,7 @@ function OnLoad()
 	end
 
 	function ShulepinAIO_Xayah:OnDraw()
-		if self.menu_draw_disable.getValue() then return end
+		--if self.menu_draw_disable.getValue() then return end
 
 		if self.menu_draw_feathers.getValue() then
 			for i, feather in pairs(self.Feathers) do
