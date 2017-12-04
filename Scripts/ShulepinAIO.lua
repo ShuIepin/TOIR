@@ -1,5 +1,5 @@
 local sdkPath = SCRIPT_PATH .. "\\Lib\\TOIR_SDK.lua"
-local supportedChamps = { "Lucian", "Jayce", "Xayah", "Draven" }
+local supportedChamps = { "Lucian", "Jayce", "Xayah", "Draven", "Fiora" }
 
 local function PrintChat(msg)
 	return __PrintTextGame("<b><font color=\"#ffffff\">[ShulepinAIO] </font></b> </font><font color=\"#c5eff7\"> " .. msg .. " </font><b><font color=\"#ffffff\"></font></b> </font>")
@@ -60,6 +60,7 @@ function OnLoad()
 	ShulepinAIO_Jayce = class()
 	ShulepinAIO_Xayah = class()
 	ShulepinAIO_Draven = class()
+	ShulepinAIO_Fiora = class()
 
 	--Lucian
 
@@ -825,7 +826,7 @@ function OnLoad()
 	end
 
 	function ShulepinAIO_Xayah:OnDraw()
-		--if self.menu_draw_disable.getValue() then return end
+		if self.menu_draw_disable.getValue() then return end
 
 		if self.menu_draw_feathers.getValue() then
 			for i, feather in pairs(self.Feathers) do
@@ -1137,6 +1138,626 @@ function OnLoad()
 	                        table.remove(self.Axes, i) 
 	                end
 	        end
+	end
+
+	--Fiora
+
+	function ShulepinAIO_Fiora:__init()
+		self.SpellData = {
+			["Aatrox"] = {
+				["aatroxeconemissile"] = {slot = 2, danger = 2, name = "Blade of Torment", isSkillshot = true}
+			},
+			["Ahri"] = {
+				["ahriorbmissile"] = { slot = 0, danger = 3, name = "Orb of Deception", isSkillshot = true },
+				["ahrifoxfiremissiletwo"] = {slot = 1, danger = 2, name = "Fox-Fire", isSkillshot = false},
+				["ahriseducemissile"] = {slot = 2, danger = 4, name = "Charm", isSkillshot = true},
+				["ahritumblemissile"] = {slot = 3, danger = 2, name = "SpiritRush", isSkillshot = false}
+			},
+			["Akali"] = {
+				["akalimota"] = {slot = 0, danger = 2, name = "Mark of the Assasin", isSkillshot = false}
+			},
+			["Amumu"] = {
+				["sadmummybandagetoss"] = {slot = 0, danger = 4, name = "Bandage Toss", isSkillshot = true}
+			},
+			["Anivia"] = {
+				["flashfrostspell"] = {slot = 0, danger = 2, name = "Flash Frost", isSkillshot = true},
+				["frostbite"] = {slot = 2, danger = 3, name = "Frostbite", isSkillshot = false}
+			},
+			["Annie"] = {
+				["disintegrate"] = {slot = 0, danger = 3, name = "Disintegrate", isSkillshot = false}
+			},
+			["Ashe"] = {
+				["volleyattack"] = {slot = 1, danger = 2, name = "Volley", isSkillshot = true},
+				["enchantedcrystalarrow"] = {slot = 3, danger = 5, name = "Enchanted Crystal Arrow", isSkillshot = true}
+			},
+			["AurelionSol"] = {
+				["aurelionsolqmissile"] = {slot = 0, danger = 2, name = "Starsurge", isSkillshot = true}
+			},
+			["Bard"] = {
+				["bardqmissile"] = {slot = 0, danger = 4, name = "Cosmic Binding", isSkillshot = true}
+			},
+			["Blitzcrank"] = {
+				["rocketgrabmissile"] = {slot = 0, danger = 5, name = "Rocket Grab", isSkillshot = true}
+			},
+			["Brand"] = {
+				["brandqmissile"] = {slot = 0, danger = 3, name = "Sear", isSkillshot = true},
+				["brandr"] = {slot = 3, danger = 5, name = "Pyroclasm", isSkillshot = false}
+			},
+			["Braum"] = {
+				["braumqmissile"] = {slot = 0, danger = 3, name = "Winter's Bite", isSkillshot = true},
+				["braumrmissile"] = {slot = 3, danger = 5, name = "Glacial Fissure", isSkillshot = true}
+			},
+			["Caitlyn"] = {
+				["caitlynpiltoverpeacemaker"] = {slot = 0, danger = 2, name = "Piltover Peacemaker", isSkillshot = true},
+				["caitlynaceintheholemissile"] = {slot = 3, danger = 4, name = "Ace in the Hole", isSkillshot = false}
+			},
+			["Cassiopeia"] = {
+				["cassiopeiatwinfang"] = {slot = 2, danger = 2, name = "Twin Fang", isSkillshot = false}
+			},
+			["Corki"] = {
+				["phosphorusbombmissile"] = {slot = 0, danger = 2, name = "Phosphorus Bomb", isSkillshot = true},
+				["missilebarragemissile"] = {slot = 3, danger = 2, name = "Missile Barrage", isSkillshot = true},
+				["missilebarragemissile2"] = {slot = 3, danger = 2, name = "Big Missile Barrage", isSkillshot = true}
+			},
+			["Diana"] = {
+				["dianaarcthrow"] = {slot = 0, danger = 2, name = "Crescent Strike", isSkillshot = true}
+			},
+			["DrMundo"] = {
+				["infectedcleavermissile"] = {slot = 0, danger = 2, name = "Infected Cleaver", isSkillshot = true}
+			},
+			["Draven"] = {
+				["dravenr"] = {slot = 3, danger = 4, name = "Whirling Death", isSkillshot = true}
+			},
+			["Ekko"] = {
+				["ekkoqmis"] = {slot = 0, danger = 2, name = "Timewinder", isSkillshot = true}
+			},
+			["Elise"] = {
+				["elisehumanq"] = {slot = 0, danger = 3, name = "Neurotoxin", isSkillshot = false},
+				["elisehumane"] = {slot = 2, danger = 4, name = "Cocoon", isSkillshot = true}
+			},
+			["Ezreal"] = {
+				["ezrealmysticshotmissile"] = {slot = 0, danger = 2, name = "Mystic Shot", isSkillshot = true},
+				["ezrealessencefluxmissile"] = {slot = 1, danger = 2, name = "Essence Flux", isSkillshot = true},
+				["ezrealarcaneshiftmissile"] = {slot = 2, danger = 1, name = "Arcane Shift", isSkillshot = false},
+				["ezrealtrueshotbarrage"] = {slot = 3, danger = 4, name = "Trueshot Barrage", isSkillshot = true}
+			},
+			["FiddleSticks"] = {
+				["fiddlesticksdarkwindmissile"] = {slot = 2, danger = 3, name = "Dark Wind", isSkillshot = false}
+			},
+			["Gangplank"] = {
+				["parley"] = {slot = 0, danger = 2, name = "Parley", isSkillshot = false}
+			},
+			["Gnar"] = {
+				["gnarqmissile"] = {slot = 0, danger = 2, name = "Boomerang Throw", isSkillshot = true},
+				["gnarbigqmissile"] = {slot = 0, danger = 3, name = "Boulder Toss", isSkillshot = true}
+			},
+			["Gragas"] = {
+				["gragasqmissile"] = {slot = 0, danger = 2, name = "Barrel Roll", isSkillshot = true},
+				["gragasrboom"] = {slot = 3, danger = 4, name = "Explosive Cask", isSkillshot = true}
+			},
+			["Graves"] = {
+				["gravesqlinemis"] = {slot = 0, danger = 2, name = "End of the Line", isSkillshot = true},
+				["graveschargeshotshot"] = {slot = 3, danger = 4, name = "Collateral Damage", isSkillshot = true}
+			},
+			["Illaoi"] = {
+				["illaoiemis"] = {slot = 2, danger = 3, name = "Test of Spirit", isSkillshot = true}
+			},
+			["Irelia"] = {
+				["IreliaTranscendentBlades"] = {slot = 3, danger = 2, name = "Transcendent Blades", isSkillshot = true}
+			},
+			["Janna"] = {
+				["howlinggalespell"] = {slot = 0, danger = 1, name = "Howling Gale", isSkillshot = true},
+				["sowthewind"] = {slot = 1, danger = 2, name = "Zephyr", isSkillshot = false}
+			},
+			["Jayce"] = {
+				["jayceshockblastmis"] = {slot = 0, danger = 2, name = "Shock Blast", isSkillshot = true},
+				["jayceshockblastwallmis"] = {slot = 0, danger = 3, name = "Empowered Shock Blast", isSkillshot = true}
+			},
+			["Jinx"] = {
+				["jinxwmissile"] = {slot = 1, danger = 2, name = "Zap!", isSkillshot = true},
+				["jinxr"] = {slot = 3, danger = 4, name = "Super Mega Death Rocket!", isSkillshot = true}
+			},
+			["Jhin"] = {
+				["jhinwmissile"] = {slot = 1, danger = 2, name = "Deadly Flourish", isSkillshot = true},
+				["jhinrshotmis"] = {slot = 3, danger = 3, name = "Curtain Call's", isSkillshot = true}
+			},
+			["Kalista"] = {
+				["kalistamysticshotmis"] = {slot = 0, danger = 2, name = "Pierce", isSkillshot = true}
+			},
+			["Karma"] = {
+				["karmaqmissile"] = {slot = 0, danger = 2, name = "Inner Flame ", isSkillshot = true},
+				["karmaqmissilemantra"] = {slot = 0, danger = 3, name = "Mantra: Inner Flame", isSkillshot = true}
+			},
+			["Kassadin"] = {
+				["nulllance"] = {slot = 0, danger = 3, name = "Null Sphere", isSkillshot = false}
+			},
+			["Katarina"] = {
+				["katarinaqmis"] = {slot = 0, danger = 3, name = "Bouncing Blade", isSkillshot = false}
+			},
+			["Kayle"] = {
+				["judicatorreckoning"] = {slot = 0, danger = 3, name = "Reckoning", isSkillshot = false}
+			},
+			["Kennen"] = {
+				["kennenshurikenhurlmissile1"] = {slot = 0, danger = 2, name = "Thundering Shuriken", isSkillshot = true}
+			},
+			["Khazix"] = {
+				["khazixwmissile"] = {slot = 1, danger = 3, name = "Void Spike", isSkillshot = true}
+			},
+			["Kogmaw"] = {
+				["kogmawq"] = {slot = 0, danger = 2, name = "Caustic Spittle", isSkillshot = true},
+				["kogmawvoidoozemissile"] = {slot = 3, danger = 2, name = "Void Ooze", isSkillshot = true},
+			},
+			["Leblanc"] = {
+				["leblancchaosorbm"] = {slot = 0, danger = 3, name = "Shatter Orb", isSkillshot = false},
+				["leblancsoulshackle"] = {slot = 2, danger = 3, name = "Ethereal Chains", isSkillshot = true},
+				["leblancsoulshacklem"] = {slot = 2, danger = 3, name = "Ethereal Chains Clone", isSkillshot = true}
+			},
+			["LeeSin"] = {
+				["blindmonkqone"] = {slot = 0, danger = 3, name = "Sonic Wave", isSkillshot = true}
+			},
+			["Leona"] = {
+				["LeonaZenithBladeMissile"] = {slot = 2, danger = 3, name = "Zenith Blade", isSkillshot = true}
+			},
+			["Lissandra"] = {
+				["lissandraqmissile"] = {slot = 0, danger = 2, name = "Ice Shard", isSkillshot = true},
+				["lissandraemissile"] = {slot = 2, danger = 1, name = "Glacial Path ", isSkillshot = true}
+			},
+			["Lucian"] = {
+				["lucianwmissile"] = {slot = 1, danger = 1, name = "Ardent Blaze", isSkillshot = true},
+				["lucianrmissileoffhand"] = {slot = 3, danger = 3, name = "The Culling", isSkillshot = true}
+			},
+			["Lulu"] = {
+				["luluqmissile"] = {slot = 0, danger = 2, name = "Glitterlance", isSkillshot = true}
+			},
+			["Lux"] = {
+				["luxlightbindingmis"] = {slot = 0, danger = 3, name = "Light Binding", isSkillshot = true} 
+			},
+			["Malphite"] = {
+				["seismicshard"] = {slot = 0, danger = 3, name = "Seismic Shard", isSkillshot = false}
+			},
+			["MissFortune"] = {
+				["missfortunericochetshot"] = {slot = 0, danger = 3, name = "Double Up", isSkillshot = false}
+			},
+			["Morgana"] = {
+				["darkbindingmissile"] = {slot = 0, danger = 4, name = "Dark Binding ", isSkillshot = true}
+			},
+			["Nami"] = {
+				["namiwmissileenemy"] = {slot = 1, danger = 2, name = "Ebb and Flow", isSkillshot = false}
+			},
+			["Nunu"] = {
+				["iceblast"] = {slot = 2, danger = 3, name = "Ice Blast", isSkillshot = false}
+			},
+			["Nautilus"] = {
+				["nautilusanchordragmissile"] = {slot = 0, danger = 3, name = "", isSkillshot = true}
+			},
+			["Nidalee"] = {
+				["JavelinToss"] = {slot = 0, danger = 2, name = "Javelin Toss", isSkillshot = true}
+			},
+			["Nocturne"] = {
+				["nocturneduskbringer"] = {slot = 0, danger = 2, name = "Duskbringer", isSkillshot = true}
+			},
+			["Pantheon"] = {
+				["pantheonq"] = {slot = 0, danger = 2, name = "Spear Shot", isSkillshot = false}
+			},
+			["RekSai"] = {
+				["reksaiqburrowedmis"] = {slot = 0, danger = 2, name = "Prey Seeker", isSkillshot = true}
+			},
+			["Rengar"] = {
+				["rengarefinal"] = {slot = 2, danger = 3, name = "Bola Strike", isSkillshot = true}
+			},
+			["Riven"] = {
+				["rivenlightsabermissile"] = {slot = 3, danger = 5, name = "Wind Slash", isSkillshot = true}
+			},
+			["Rumble"] = {
+				["rumblegrenade"] = {slot = 2, danger = 2, name = "Electro Harpoon", isSkillshot = true}
+			},
+			["Ryze"] = {
+				["ryzeq"] = {slot = 0, danger = 2, name = "Overload", isSkillshot = true},
+				["ryzee"] = {slot = 2, danger = 2, name = "Spell Flux", isSkillshot = false}
+			},
+			["Sejuani"] = {
+				["sejuaniglacialprison"] = {slot = 3, danger = 5, name = "Glacial Prison", isSkillshot = true}
+			},
+			["Sivir"] = {
+				["sivirqmissile"] = {slot = 0, danger = 2, name = "Boomerang Blade", isSkillshot = true}
+			},
+			["Skarner"] = {
+				["skarnerfracturemissile"] = {slot = 0, danger = 2, name = "Fracture ", isSkillshot = true}
+			},
+			["Shaco"] = {
+				["twoshivpoison"] = {slot = 2, danger = 3, name = "Two-Shiv Poison", isSkillshot = false}
+			},
+			["Sona"] = {
+				["sonaqmissile"] = {slot = 0, danger = 3, name = "Hymn of Valor", isSkillshot = false},
+				["sonar"] = {slot = 3, danger = 5, name = "Crescendo ", isSkillshot = true}
+			},
+			["Swain"] = {
+				["swaintorment"] = {slot = 2, danger = 4, name = "Torment", isSkillshot = false}
+			},
+			["Syndra"] = {
+				["syndrarspell"] = {slot = 3, danger = 5, name = "Unleashed Power", isSkillshot = false}
+			},
+			["Teemo"] = {
+				["blindingdart"] = {slot = 0, danger = 4, name = "Blinding Dart", isSkillshot = false}
+			},
+			["Tristana"] = {
+				["detonatingshot"] = {slot = 2, danger = 3, name = "Explosive Charge", isSkillshot = false}
+			},
+			["TahmKench"] = {
+				["tahmkenchqmissile"] = {slot = 0, danger = 2, name = "Tongue Lash", isSkillshot = true}
+			},
+			["Taliyah"] = {
+				["taliyahqmis"] = {slot = 0, danger = 2, name = "Threaded Volley", isSkillshot = true}
+			},
+			["Talon"] = {
+				["talonrakemissileone"] = {slot = 1, danger = 2, name = "Rake", isSkillshot = true}
+			},
+			["TwistedFate"] = {
+				["bluecardpreattack"] = {slot = 1, danger = 3, name = "Blue Card", isSkillshot = false},
+				["goldcardpreattack"] = {slot = 1, danger = 4, name = "Gold Card", isSkillshot = false},
+				["redcardpreattack"] = {slot = 1, danger = 3, name = "Red Card", isSkillshot = false}
+			},
+			["Urgot"] = {
+				--
+			},
+			["Varus"] = {
+				["varusqmissile"] = {slot = 0, danger = 2, name = "Piercing Arrow", isSkillshot = true},
+				["varusrmissile"] = {slot = 3, danger = 5, name = "Chain of Corruption", isSkillshot = true}
+			},
+			["Vayne"] = {
+				["vaynecondemnmissile"] = {slot = 2, danger = 3, name = "Condemn", isSkillshot = false}
+			},
+			["Veigar"] = {
+				["veigarbalefulstrikemis"] = {slot = 0, danger = 2, name = "Baleful Strike", isSkillshot = true},
+				["veigarr"] = {slot = 3, danger = 5, name = "Primordial Burst", isSkillshot = false}
+			},
+			["Velkoz"] = {
+				["velkozqmissile"] = {slot = 0, danger = 2, name = "Plasma Fission", isSkillshot = true},
+				["velkozqmissilesplit"] = {slot = 0, danger = 2, name = "Plasma Fission Split", isSkillshot = true}
+	 		},
+			["Viktor"] = {
+				["viktorpowertransfer"] = {slot = 0, danger = 3, name = "Siphon Power", isSkillshot = false},
+				["viktordeathraymissile"] = {slot = 2, danger = 3, name = "Death Ray", isSkillshot = true}
+			},
+			["Vladimir"] = {
+				["vladimirtidesofbloodnuke"] = {slot = 2, danger = 3, name = "Tides of Blood", isSkillshot = false}
+			},
+			["Yasuo"] = {
+				["yasuoq3w"] = {slot = 0, danger = 3, name = "Gathering Storm", isSkillshot = true}
+			},
+			["Zed"] = {
+				["zedqmissile"] = {slot = 0, danger = 2, name = "Razor Shuriken ", isSkillshot = true}
+			},
+			["Zyra"] = {
+				["zyrae"] = {slot = 2, danger = 3, name = "Grasping Roots", isSkillshot = true}
+			}
+		}
+
+		-- Passive
+		self.objList = {}
+		self.trackList = {}
+		self.passtiveList = {
+			["Fiora_Base_Passive_NE.troy"] = { x = 0, z = 200},
+			["Fiora_Base_Passive_NW.troy"] = { x = 200, z = 0},
+			["Fiora_Base_Passive_SE.troy"] = { x = -1 * 200, z = 0},
+			["Fiora_Base_Passive_SW.troy"] = { x = 0, z = -1 * 200},
+			["Fiora_Base_R_Mark_NE_FioraOnly.troy"] = { x = 0, z = 200},
+			["Fiora_Base_R_Mark_NW_FioraOnly.troy"] = { x = 200, z = 0},
+			["Fiora_Base_R_Mark_SE_FioraOnly.troy"] = { x = -1 * 200, z = 0},
+			["Fiora_Base_R_Mark_SW_FioraOnly.troy"] = { x = 0, z = -1 * 200}
+		}
+
+		--Main Menu
+		self.menu = menuInst.addItem(SubMenu.new("Fiora", Lua_ARGB(255, 100, 250, 50)))
+
+		--TS
+		self.menu_ts = TargetSelector(1500, 1, myHero, true, self.menu, true)
+
+		--Combo
+		self.menu_combo = self.menu.addItem(SubMenu.new("Combo"))
+		self.menu_combo_q = self.menu_combo.addItem(MenuBool.new("Use Q", true))
+		--self.menu_combo_w = self.menu_combo.addItem(MenuBool.new("Use W", true))
+		self.menu_combo_e = self.menu_combo.addItem(MenuBool.new("Use E", true))
+		--self.menu_combo_r = self.menu_combo.addItem(MenuBool.new("Use R", true))
+		self.menu_combo_items = self.menu_combo.addItem(MenuBool.new("Use Items", true))
+
+		--Evade
+		self.menu_evade = self.menu.addItem(SubMenu.new("W Block"))
+		self.menu_evade.addItem(MenuSeparator.new("Spell Settings", true))
+		self.menu_evade_spells = {}
+		self.menu_evade_spells_dec = {}
+		for i, enemy in pairs(GetEnemyHeroes()) do
+			local enemy = GetAIHero(enemy)
+			if self.SpellData[enemy.CharName] then
+				for i, v in pairs(self.SpellData[enemy.CharName]) do
+					if enemy and v then
+						local SlotToStr = ({[_Q] = "Q", [_W] = "W", [_E] = "E", [_R] = "R"})[v.slot]
+
+						table.insert(self.menu_evade_spells, {
+							charName = enemy.CharName,
+							slot = v.slot,
+							menu = self.menu_evade.addItem(SubMenu.new(enemy.CharName.." | "..SlotToStr.." | "..v.name))
+							})
+
+						
+						for i = 1, #self.menu_evade_spells do
+					                local index = 0
+
+					                if self.menu_evade_spells[i].charName == enemy.CharName and self.menu_evade_spells[i].slot == v.slot then
+					                        index = i
+					                end
+
+					                if index ~= 0 then
+					                        table.insert(self.menu_evade_spells_dec, {
+					                        	name = v.name,
+					                        	enabled = self.menu_evade_spells[index].menu.addItem(MenuBool.new("Enabled", true)),
+					                        	danger = self.menu_evade_spells[index].menu.addItem(MenuSlider.new("Danger Value", v.danger or 1, 1, 5, 1))
+					                        	})
+					                end
+        					end
+					end
+				end
+			end
+		end
+		self.menu_evade.addItem(MenuSeparator.new("Block Settings", true))
+		self.menu_evade_enabled = self.menu_evade.addItem(MenuBool.new("Enabled", true))
+		self.menu_evade_combo = self.menu_evade.addItem(MenuBool.new("Only On Combo", true))
+		self.menu_evade_danger = self.menu_evade.addItem(MenuSlider.new("Min. Danger Value", 3, 1, 5, 1))
+
+		--Draw
+		self.menu_draw = self.menu.addItem(SubMenu.new("Drawings"))
+		self.menu_draw_disable = self.menu_draw.addItem(MenuBool.new("Disable All Drawings", false))
+
+		--Keys
+		self.menu_key = self.menu.addItem(SubMenu.new("Keys"))
+		self.menu_key_combo = self.menu_key.addItem(MenuKeyBind.new("Combo Key", 32))
+
+		self.MissileSpellsData = {}
+
+		Callback.Add("Tick", function() self:OnTick() end)
+		Callback.Add("Draw", function() self:OnDraw() end)
+		Callback.Add("DoCast", function(...) self:OnDoCast(...) end)
+		Callback.Add("CreateObject", function(...) self:OnCreateObject(...) end)
+		Callback.Add("DeleteObject", function(...) self:OnDeleteObject(...) end)
+
+		PrintChat("Fiora loaded.")
+	end
+
+	function ShulepinAIO_Fiora:GetQPos()
+		local result = nil
+		local distanceTemp = math.huge
+
+		for i, obj in pairs(self.trackList) do
+			local origin_x, origin_y, origin_z = GetPos(obj.Addr)
+			local origin = Vector(origin_x, origin_y, origin_z)
+
+			if origin then
+				local distance = self.passtiveList[obj.Name]
+
+				local buff_pos = {
+					x = origin.x + distance.x,
+					y = origin.y,
+					z = origin.z + distance.z
+				}
+
+				local buff_pos_distance = GetDistance(buff_pos)
+				if not result or buff_pos_distance < distanceTemp then
+					result = buff_pos
+					distanceTemp = buff_pos_distance
+				end
+			end
+		end
+
+		return result, distanceTemp
+	end
+
+	function ShulepinAIO_Fiora:ObjList()
+		local result = {}
+
+		for i, object in pairs(self.objList) do
+			local nID = object.NetworkId
+
+			if nID then
+				self.trackList[nID] = object
+			else
+				table.insert(result, object)
+			end
+		end
+
+		self.objList = result
+	end
+
+	function ShulepinAIO_Fiora:CastQ()
+		local buff_pos, distance = self:GetQPos()
+		if buff_pos and distance > 100 then
+			if CanCast(_Q) and distance < 450 then
+				CastSpellToPos(buff_pos.x, buff_pos.z, _Q)
+			end
+		end
+	end
+
+	function ShulepinAIO_Fiora:OnTick()
+		self:ObjList()
+
+		if self.menu_key_combo.getValue() then
+			if self.menu_combo_q.getValue() then
+				self:CastQ()
+			end
+		end
+	end
+
+	function ShulepinAIO_Fiora:OnDraw()
+		--if self.menu_draw_disable.getValue() then return end
+
+		--for i, obj in pairs(self.trackList) do
+		--	local origin_x, origin_y, origin_z = GetPos(obj.Addr)
+		--	local origin = Vector(origin_x, origin_y, origin_z)
+		--
+		--	if origin then
+		--		local distance = self.passtiveList[obj.Name]
+		--		DrawCircleGame(origin.x + distance.x, origin.y, origin.z + distance.z,100, Lua_ARGB(255,255,255,255))
+		--	end
+		--end
+
+		local function dRectangleOutline(s, e, w, t, c)
+			local z1 = s+Vector(Vector(e)-s):Perpendicular():Normalized()*w/2
+			local z2 = s+Vector(Vector(e)-s):Perpendicular2():Normalized()*w/2
+			local z3 = e+Vector(Vector(s)-e):Perpendicular():Normalized()*w/2
+			local z4 = e+Vector(Vector(s)-e):Perpendicular2():Normalized()*w/2
+			local z5 = s+Vector(Vector(e)-s):Perpendicular():Normalized()*w
+			local z6 = s+Vector(Vector(e)-s):Perpendicular2():Normalized()*w
+			local c1 = WorldToScreenPos(z1.x, z1.y, z1.z)
+			local c2 = WorldToScreenPos(z2.x, z2.y, z2.z)
+			local c3 = WorldToScreenPos(z3.x, z3.y, z3.z)
+			local c4 = WorldToScreenPos(z4.x, z4.y, z4.z)
+			local c5 = WorldToScreenPos(z5.x, z5.y, z5.z)
+			local c6 = WorldToScreenPos(z6.x, z6.y, z6.z)
+			DrawLineD3DX(c5.x,c5.y,c6.x,c6.y,t+1,Lua_ARGB(200,250,192,0))
+			DrawLineD3DX(c2.x,c2.y,c3.x,c3.y,t,c)
+			DrawLineD3DX(c3.x,c3.y,c4.x,c4.y,t,c)
+			DrawLineD3DX(c1.x,c1.y,c4.x,c4.y,t,c)
+		end
+
+		if self.menu_evade_enabled.getValue() then
+			for i, missile in pairs(self.MissileSpellsData) do
+				if missile then
+					if not IsDead(missile.addr) then
+						local enabled, danger = nil, nil
+
+						for i = 1, #self.menu_evade_spells_dec do
+					                local index = 0
+
+					                if self.menu_evade_spells_dec[i].name == missile.name then
+					                        index = i
+					                end
+
+					                if index ~= 0 then
+					                        enabled = self.menu_evade_spells_dec[index].enabled
+					                        danger = self.menu_evade_spells_dec[index].danger
+					                end
+        					end
+
+        					if enabled and enabled.getValue() then
+							if missile.isSkillshot and GetMissile(missile.addr).TargetId == 0 then
+								local spellPos_x, spellPos_y, spellPos_z = GetPos(missile.addr)
+								local spellPos = Vector(spellPos_x, spellPos_y, spellPos_z)
+
+								dRectangleOutline(Vector(spellPos_x, myHero.y, spellPos_z), 
+						  			Vector(missile.endPos.x, myHero.y, missile.endPos.z), 
+						  			missile.width + GetOverrideCollisionRadius(myHero.Addr), 2, Lua_ARGB(255,255,255,255))
+
+								local pointSegment, pointLine, isOnSegment = VectorPointProjectionOnLineSegment(missile.startPos, missile.endPos, myHero)
+
+								if isOnSegment and GetDistance(pointSegment) < missile.width + (GetOverrideCollisionRadius(myHero.Addr) / 2) then
+									local time = (GetDistance(spellPos) - GetOverrideCollisionRadius(myHero.Addr)) / GetMissile(missile.addr).MissileSpeed
+
+									if danger and danger.getValue() >= self.menu_evade_danger.getValue() then
+										if CanCast(_W) and time < 0.2 + (GetPing()/2) then
+											local target = self.menu_ts:GetTarget() ~= 0 and GetAIHero(self.menu_ts:GetTarget()) or GetMousePos()
+
+											if self.menu_evade_combo.getValue() then
+												if self.menu_key_combo.getValue() then
+													CastSpellToPos(target.x, target.z, _R)
+												end
+											else
+												CastSpellToPos(target.x, target.z, _W)
+											end
+										end
+									end
+								end
+							elseif not missile.isSkillshot and GetMissile(missile.addr).TargetId == myHero.Id then
+								if danger and danger.getValue() >= self.menu_evade_danger.getValue() then
+									if CanCast(_W) then
+										local target = self.menu_ts:GetTarget() ~= 0 and GetAIHero(self.menu_ts:GetTarget()) or GetMousePos()
+
+										if self.menu_evade_combo.getValue() then
+											if self.menu_key_combo.getValue() then
+												CastSpellToPos(target.x, target.z, _W)
+											end
+										else
+											CastSpellToPos(target.x, target.z, _W)
+										end
+									end
+								end
+							end
+        					end
+					end
+				end
+			end
+		end
+	end
+
+	function ShulepinAIO_Fiora:OnDoCast(unit, spell)
+		if unit.IsMe and self.menu_key_combo.getValue() then
+			if spell.Name:lower():find("attack") and CanCast(_E) and self.menu_combo_e.getValue() then
+				CastSpellTarget(myHero.Addr, _E)
+			end
+
+			if (spell.Name == "FioraEAttack") and not CanCast(_E) and self.menu_combo_items.getValue() then --3077 3748 ItemTiamatCleave  ItemTitanicHydraCleave spell.Name == "FioraEAttack"
+				local tiamat = GetSpellIndexByName("ItemTiamatCleave")
+				local titan = GetSpellIndexByName("ItemTitanicHydraCleave")
+
+				if myHero.HasItem(3074) and CanCast(tiamat) then
+					CastSpellTarget(myHero.Addr, tiamat)
+				end
+
+				if myHero.HasItem(3077) and CanCast(tiamat) then
+					CastSpellTarget(myHero.Addr, tiamat)
+				end
+
+				if myHero.HasItem(3748) and CanCast(titan) then
+					CastSpellTarget(myHero.Addr, titan)
+				end
+			end
+		end
+	end
+
+	function ShulepinAIO_Fiora:OnCreateObject(obj)
+		if self.passtiveList[obj.Name] then
+			table.insert(self.objList, obj)
+		end
+
+		if obj and obj.Type == 6 then
+			local missile = GetMissile(obj.Addr)
+
+			if missile then
+				if self.SpellData and self.SpellData[missile.OwnerCharName] then
+					local data = self.SpellData[missile.OwnerCharName]
+
+					if data and data[missile.Name:lower()] then
+						local spell = data[missile.Name:lower()]
+
+						local startPos = Vector(missile.SrcPos_x, missile.SrcPos_y, missile.SrcPos_z)
+						local __endPos = Vector(missile.DestPos_x, missile.DestPos_y, missile.DestPos_z)
+						local endPos = Vector(startPos):Extended(__endPos, missile.Range)
+
+						table.insert(self.MissileSpellsData, {
+							addr = missile.Addr,
+							name = spell.name,
+							slot = spell.slot,
+							danger = spell.danger,
+							isSkillshot = spell.isSkillshot,
+							startPos = startPos,
+							endPos = endPos,
+							width = missile.Width,
+							range = missile.Range,
+							})
+					end
+				end
+			end
+		end
+	end
+
+	function ShulepinAIO_Fiora:OnDeleteObject(obj)
+		if self.passtiveList[obj.Name] then
+			self.trackList[obj.NetworkId] = nil
+		end
+
+		for i, missile in pairs(self.MissileSpellsData) do
+			if missile.addr == obj.Addr then
+				table.remove(self.MissileSpellsData, i)
+			end
+		end
 	end
 
 	if table.contains(supportedChamps, myHero.CharName) then
