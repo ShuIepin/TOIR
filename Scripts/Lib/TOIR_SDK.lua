@@ -1,4 +1,4 @@
-SDK_VERSION = 0.2
+SDK_VERSION = 0.3
 
 ----------------------------------------------------------------
 -- SANDBOX
@@ -584,6 +584,15 @@ function GetOrigin(unit)
         end
 end
 
+function GetTargetById(targetid, range)
+        GetAllUnitAroundAnObject(myHero.Addr, range)
+        for i, obj in pairs(pUnit) do
+                if obj ~= 0 and GetId(obj) == targetid then
+                        return obj
+                end
+        end
+end
+
 function GetPing()
         return GetLatency() / 1000
 end
@@ -1117,10 +1126,6 @@ function Rectangle:Draw(color)
         FilledRectD3DX(self.x, self.y, self.width, self.height, color or Lua_ARGB(255,255,255,255)) 
 end
 
-function Rectangle:Draw2(color) 
-        FilledRectD3DX_2(self.x, self.y, self.width, self.height, color or Lua_ARGB(255,255,255,255)) 
-end
-
 ----------------------------------------------------------------
 -- Draw
 ----------------------------------------------------------------
@@ -1213,8 +1218,8 @@ local TEXTYOFFSET 	= -7
 local TOGGLEWIDTH 	= 30
 local MENUTEXTCOLOR 	= Lua_ARGB(255, 255, 255, 255)
 local MENUBGCOLOR	= Lua_ARGB(175, 0, 0, 0)
-local MENUBGACTIVE 	= Lua_ARGB(255, 0, 36, 51)
-local MENUBORDERCOLOR   = Lua_ARGB(255, 0, 0, 0)
+local MENUBGACTIVE 	= Lua_ARGB(175, 0, 36, 51)
+local MENUBORDERCOLOR   = Lua_ARGB(175, 0, 0, 0)
 
 ----------------------------------------------------------------
 -- Menu: Util functions
@@ -1359,15 +1364,15 @@ local function GetTextWidth(text, offset)
 
         for c in text:gmatch"." do
                 if c==" " then 
-                        ret = ret + 4
+                        ret = ret + 2
                 elseif tonumber(c) ~= nil then 
-                        ret = ret + 6
+                        ret = ret + 4
                 elseif c == str.upper(c) then 
-                        ret = ret + 8
+                        ret = ret + 6
                 elseif c == str.lower(c) then 
-                        ret = ret + 7
+                        ret = ret + 5
                 else 
-                        ret = ret + 5 
+                        ret = ret + 3 
                 end
         end
 
@@ -1509,9 +1514,9 @@ function MainMenu.new()
                 for i, item in pairs(this.children) do
                         item.onLoop()
                 end
-                FilledRectD3DX_2(this.pos.x,this.pos.y,1,this.fullHeight+1, MENUBORDERCOLOR)
-                FilledRectD3DX_2(this.pos.x+this.width,this.pos.y,1,this.fullHeight+1, MENUBORDERCOLOR)
-                FilledRectD3DX_2(this.pos.x,this.pos.y+this.fullHeight,this.width,1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x,this.pos.y,1,this.fullHeight+1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x+this.width,this.pos.y,1,this.fullHeight+1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x,this.pos.y+this.fullHeight,this.width,1, MENUBORDERCOLOR)
         end
         
         return this
@@ -1709,11 +1714,11 @@ function SubMenu.new(name, color)
                         end
                         this.rectangle:Draw(MENUBGACTIVE)
                 else
-                        this.rectangle:Draw2(MENUBGCOLOR)
+                        this.rectangle:Draw(MENUBGCOLOR)
                 end 
-                DrawTextD3DX(this.pos.x+this.rectangle.width-15, this.textY, ">", MENUTEXTCOLOR)
-                DrawTextD3DX(this.pos.x+5, this.textY, this.name, this.color)
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                DrawTextD3DX(this.pos.x+this.rectangle.width-15, this.textY, ">", MENUTEXTCOLOR, 1, 1)
+                DrawTextD3DX(this.pos.x+5, this.textY, this.name, this.color, 1, 1)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
                 
                 if not this.active then return end
 
@@ -1723,9 +1728,9 @@ function SubMenu.new(name, color)
                 for i, item in pairs(this.children) do
                         item.onLoop()
                 end
-                FilledRectD3DX_2(this.pos.x+this.rectangle.width,this.rectangle.y,1,this.fullHeight+1, MENUBORDERCOLOR)
-                FilledRectD3DX_2(this.pos.x+this.rectangle.width+this.childWidth,this.rectangle.y,1,this.fullHeight+1, MENUBORDERCOLOR)
-                FilledRectD3DX_2(this.pos.x+this.rectangle.width,this.rectangle.y+this.fullHeight,this.childWidth,1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x+this.rectangle.width,this.rectangle.y,1,this.fullHeight+1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x+this.rectangle.width+this.childWidth,this.rectangle.y,1,this.fullHeight+1, MENUBORDERCOLOR)
+                FilledRectD3DX(this.pos.x+this.rectangle.width,this.rectangle.y+this.fullHeight,this.childWidth,1, MENUBORDERCOLOR)
 
         end
         
@@ -1834,17 +1839,17 @@ function MenuBool.new(name, active)
                         end
                 end
                 
-                this.rectangle:Draw2(MENUBGCOLOR)
+                this.rectangle:Draw(MENUBGCOLOR)
                 if this.valueActive then
                         this.activeRectangle:Draw(Lua_ARGB(255, 2, 171, 232))
-                        DrawTextD3DX(this.pos.x+this.rectangle.width-25, this.textY, "On", MENUTEXTCOLOR)
+                        DrawTextD3DX(this.pos.x+this.rectangle.width-23, this.textY, "On", MENUTEXTCOLOR, 1)
                 else
                         this.activeRectangle:Draw(Lua_ARGB(255, 36, 36, 36))
-                        DrawTextD3DX(this.pos.x+this.rectangle.width-25, this.textY, "Off", MENUTEXTCOLOR)
+                        DrawTextD3DX(this.pos.x+this.rectangle.width-23, this.textY, "Off", MENUTEXTCOLOR, 1)
                 end
-                FilledRectD3DX_2(this.activeRectangle.x-1,this.activeRectangle.y,1,this.activeRectangle.height,MENUBORDERCOLOR)
-                DrawTextD3DX(this.pos.x+5, this.textY, this.name, MENUTEXTCOLOR)
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                FilledRectD3DX(this.activeRectangle.x-1,this.activeRectangle.y,1,this.activeRectangle.height,MENUBORDERCOLOR)
+                DrawTextD3DX(this.pos.x+5, this.textY, this.name, MENUTEXTCOLOR, 1)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
         function this.show()
         end
@@ -1965,13 +1970,13 @@ function MenuSlider.new(name, value, mi, ma, step)
                         this.value=val
                         this.updateSlider()
                 end
-                this.rectangle:Draw2(MENUBGCOLOR)
+                this.rectangle:Draw(MENUBGCOLOR)
                 this.sliderRectangle:Draw(4278190335)
-                DrawTextD3DX(this.pos.x+5, this.textY, this.name, MENUTEXTCOLOR)
+                DrawTextD3DX(this.pos.x+5, this.textY, this.name, MENUTEXTCOLOR, 1)
                 local textval=str.format("%."..this.places.."f", this.value)
-                DrawTextD3DX(this.pos.x+this.rectangle.width-GetTextWidth(textval, 10), this.textY, textval, MENUTEXTCOLOR)
+                DrawTextD3DX(this.pos.x+this.rectangle.width-GetTextWidth(textval, 10), this.textY, textval, MENUTEXTCOLOR, 1)
                 
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
         
         function this.show()
@@ -2089,9 +2094,9 @@ function MenuSeparator.new(name, center, color)
         
                 local textH = this.textCenter and (this.textX - (this.textW/2)) or this.pos.x + 5
 
-                this.rectangle:Draw2(MENUBGCOLOR)
-                DrawTextD3DX(textH, this.textY, this.name, this.color)
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                this.rectangle:Draw(MENUBGCOLOR)
+                DrawTextD3DX(textH, this.textY, this.name, this.color, 1)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
         
         function this.show()
@@ -2196,17 +2201,17 @@ function MenuKeyBind.new(name, keycode)
         end
 
         function this.onLoop()
-                this.rectangle:Draw2(MENUBGCOLOR)
+                this.rectangle:Draw(MENUBGCOLOR)
                 if this.getValue() then
                         this.activeRectangle:Draw(Lua_ARGB(255, 2, 171, 232))
-                        DrawTextD3DX(this.pos.x+this.rectangle.width-24, this.textY, "On",MENUTEXTCOLOR)
+                        DrawTextD3DX(this.pos.x+this.rectangle.width-23, this.textY, "On",MENUTEXTCOLOR, 1)
                 else
                         this.activeRectangle:Draw(Lua_ARGB(255, 36, 36, 36))
-                        DrawTextD3DX(this.pos.x+this.rectangle.width-24, this.textY, "Off",MENUTEXTCOLOR)
+                        DrawTextD3DX(this.pos.x+this.rectangle.width-23, this.textY, "Off",MENUTEXTCOLOR, 1)
                 end
-                FilledRectD3DX_2(this.activeRectangle.x-1,this.activeRectangle.y,1,this.activeRectangle.height,MENUBORDERCOLOR)
-                DrawTextD3DX(this.pos.x+5, this.textY, string.format("%s [%s]",this.name, this.keycodeString),MENUTEXTCOLOR)
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                FilledRectD3DX(this.activeRectangle.x-1,this.activeRectangle.y,1,this.activeRectangle.height,MENUBORDERCOLOR)
+                DrawTextD3DX(this.pos.x+5, this.textY, string.format("%s [%s]",this.name, this.keycodeString),MENUTEXTCOLOR, 1)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
         
         function this.show()
@@ -2319,17 +2324,17 @@ function MenuStringList.new(name, stringlist, index)
         end
 
         function this.onLoop()
-                this.rectangle:Draw2(MENUBGCOLOR)
+                this.rectangle:Draw(MENUBGCOLOR)
                 
                 this.leftRectangle:Draw(Lua_ARGB(255, 0, 36, 51))
                 this.rightRectangle:Draw(Lua_ARGB(255, 0, 36, 51))
-                FilledRectD3DX_2(this.leftRectangle.x-2,this.leftRectangle.y,1,this.leftRectangle.height,MENUBORDERCOLOR)
-                FilledRectD3DX_2(this.rightRectangle.x-2,this.rightRectangle.y,1,this.rightRectangle.height,MENUBORDERCOLOR)
-                DrawTextD3DX(this.rightRectangle.x+10, this.textY, ">",MENUTEXTCOLOR)
-                DrawTextD3DX(this.leftRectangle.x+10, this.textY, "<",MENUTEXTCOLOR)
-                DrawTextD3DX(this.pos.x+5, this.textY, this.name,MENUTEXTCOLOR)
-                DrawTextD3DX(this.leftRectangle.x-GetTextWidth(this.stringlist[this.selectedIndex], 5), this.textY, this.stringlist[this.selectedIndex], MENUTEXTCOLOR)
-                FilledRectD3DX_2(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
+                FilledRectD3DX(this.leftRectangle.x-2,this.leftRectangle.y,1,this.leftRectangle.height,MENUBORDERCOLOR)
+                FilledRectD3DX(this.rightRectangle.x-2,this.rightRectangle.y,1,this.rightRectangle.height,MENUBORDERCOLOR)
+                DrawTextD3DX(this.rightRectangle.x+10, this.textY, ">",MENUTEXTCOLOR, 1)
+                DrawTextD3DX(this.leftRectangle.x+10, this.textY, "<",MENUTEXTCOLOR, 1)
+                DrawTextD3DX(this.pos.x+5, this.textY, this.name,MENUTEXTCOLOR, 1)
+                DrawTextD3DX(this.leftRectangle.x-GetTextWidth(this.stringlist[this.selectedIndex], 5), this.textY, this.stringlist[this.selectedIndex], MENUTEXTCOLOR, 1)
+                FilledRectD3DX(this.rectangle.x,this.rectangle.y,this.rectangle.width,1,MENUBORDERCOLOR)
         end
 
         function this.show()
@@ -3321,6 +3326,9 @@ local DamageLibTable = {
 }
 
 function GetDamage(spell, target, stage, level)
+        assert(type(spell) == "string", "GetDamage: Wrong argument types (<string> expected for <1> arg)")
+        assert(type(target) == "table", "GetDamage: Wrong argument types (<table> expected for <2> arg)")
+
         local source = myHero
         local stage = stage or 1
         local spellTable = {}
