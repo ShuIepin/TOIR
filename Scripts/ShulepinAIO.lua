@@ -21,7 +21,7 @@ function OnLoad()
 		IncludeFile("Lib\\TOIR_SDK.lua")
 
 		if SDK_VERSION and type(SDK_VERSION) == "number" then
-			if SDK_VERSION == 0.3 then
+			if SDK_VERSION == 0.4 then
 				PrintChat("TOIR_SDK.lua loaded (v" .. SDK_VERSION .. ")")
 			else
 				PrintChat("You are used outdated TOIR_SDK.lua, please update it.")
