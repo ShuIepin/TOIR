@@ -4159,6 +4159,7 @@ function VPrediction:__init(menu)
         self.EnemyMinions = minionManager(MINION_ENEMY, 2000, myHero, MINION_SORT_HEALTH_ASC)
         self.JungleMinions = minionManager(MINION_JUNGLE, 2000, myHero, MINION_SORT_HEALTH_ASC)
         self.OtherMinions = minionManager(MINION_OTHER, 2000, myHero, MINION_SORT_HEALTH_ASC)
+	self.AllyMinions = minionManager(MINION_ALLY, 2000, myHero, MINION_SORT_HEALTH_ASC)
 
         self.TargetsVisible = {}
         self.TargetsWaypoints = {}
@@ -4776,6 +4777,7 @@ function VPrediction:GetBestCastPosition(unit, delay, radius, range, speed, from
         self.EnemyMinions:update()
         self.JungleMinions:update()
         self.OtherMinions:update()
+	self.AllyMinions:update()
 
         if self.VPMenu_Collision then
             if self.VPMenu_CastPos.getValue() and self:CheckMinionCollision(unit, CastPosition, delay, radius, range, speed, from, false, false) then
@@ -4979,6 +4981,7 @@ function VPrediction:CheckMinionCollision(unit, Position, delay, radius, range, 
         self.EnemyMinions:update()
         self.JungleMinions:update()
         self.OtherMinions:update()
+	self.AllyMinions:update()
     end
 
     local result = false
@@ -5581,6 +5584,8 @@ function HPrediction:Variables()
   
   self.EnemyMinions = minionManager(MINION_ENEMY, 2000, myHero, MINION_SORT_HEALTH_ASC)
   self.JungleMobs = minionManager(MINION_JUNGLE, 2000, myHero, MINION_SORT_MAXHEALTH_DEC)
+  self.OtherMinions = minionManager(MINION_OTHER, 2000, myHero, MINION_SORT_HEALTH_ASC)
+  self.AllyMinions = minionManager(MINION_ALLY, 2000, myHero, MINION_SORT_HEALTH_ASC)
   
 end
 
@@ -5692,6 +5697,8 @@ function HPrediction:OnTick()
 
   self.EnemyMinions:update()
   self.JungleMobs:update()
+  self.AllyMinions:update()
+  self.OtherMinions:update()
   
   --[[if self.HPMenu_Ignore.getValue() then
 
